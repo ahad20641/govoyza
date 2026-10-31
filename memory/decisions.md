@@ -12,3 +12,9 @@
   admin portal (Phase 11) is built.
 - Front end is plain HTML/CSS/JS (no Livewire); Vite/Tailwind are installed but not required to run.
 - Tests run on SQLite in-memory (`phpunit.xml`); production uses MySQL 8.
+
+## 2026-11-01 — Local development database and runtime
+
+- Local Windows development uses PHP 8.4 installed via WinGet and SQLite (`DB_CONNECTION=sqlite` in the ignored local `.env`).
+- CI and production continue to use MySQL; `.env.example` and the CI MySQL service remain unchanged.
+- Node.js 26 is the selected local and CI major version; Composer is 2.11.
