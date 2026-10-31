@@ -22,8 +22,11 @@
   Move each table to `*_minor` + `currency` with `MoneyCast` when its task rebuilds it (1.12, 1.17, 1.23, 1.24).
   New tables must use `MoneyCast` from the start.
 
-- Subdomains created in hPanel/API default to `domains/<main>/public_html/<sub>`, inside the main site's web root.
-  For a separate app (staging), give the subdomain a folder outside `public_html`. Use the public directory only for same-app hosts (partner/admin).
+- A subdomain's web root is always under `domains/<main>/public_html/…`. The API rejects `..`, and a custom
+  folder name still lands inside `public_html`. So a separate app (staging) must be its own *website*,
+  never a subdomain. Subdomains are only for same-app hosts (partner/admin, root = `public_html`).
+- The owner sometimes pastes template placeholders (`HOST_HERE`, `PROD_DB_NAME`, …) instead of real values.
+  Never guess or proceed with them; ask again.
 - `deploy/post-deploy.sh` must be committed. CI rsyncs the checkout, so untracked deploy files never reach the server.
 
 ## Laravel

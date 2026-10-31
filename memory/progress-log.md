@@ -3,6 +3,13 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.2 deploy config)
+- Redacted the Hostinger username from all unpushed history (filter-branch on `origin/develop..`) before the first push; pushed 1.4 as PR #1.
+- Staging moved from a subdomain to a separate website (`staging.govoyza.com`). Partner/admin stay subdomains with root = `public_html`. Decision recorded; `deploy/hostinger.md` rewritten with placeholders only. `STAGING_APP_PATH` secret set.
+- Fixed the env template names. Added `EnvTemplateTest` and `RepositoryGuardsTest` (no new decimal money columns, no real Hostinger username in the repo). 58 tests pass.
+- Added per-task "convert decimal money columns" checkboxes to 1.12/1.17/1.23/1.24.
+- Next: owner sends the real SSH host/port and DB names (still placeholders), then server setup and the first staging deploy.
+
 ## 2026-11-01 (task 1.2 progress, task 1.4)
 - 1.2: committed `deploy/post-deploy.sh` (CI needs it; switched it to PHP 8.4). Created `partner`/`admin`
   subdomains and the GitHub `staging`/`production` environments; the required reviewer was accepted once the repo went public.

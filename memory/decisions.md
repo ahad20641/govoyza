@@ -35,3 +35,21 @@
   pair, the inverse pair (1/rate) is used.
 - The buffer % always *increases* the converted amount (a safety margin on selling prices).
   `CurrencyConverter::convert(..., withBuffer: false)` gives the raw rate for reports.
+
+## 2026-11-01 — Hostinger hosting layout (task 1.2)
+
+- **Production** app in `~/domains/govoyza.com/app`; `~/domains/govoyza.com/public_html` is a
+  symlink to `app/public`.
+- **partner. / admin.** are *subdomains* of govoyza.com whose root is `public_html` itself (API flag
+  "use the website public directory"). They serve the same production app, and `Route::domain()`
+  picks the portal. Nothing is nested inside `public_html`, and they use no website slots.
+- **Staging** is a separate *website* (addon) `staging.govoyza.com`. Its app is in
+  `~/domains/govoyza.com/staging-app` (outside any `public_html`), and
+  `~/domains/staging.govoyza.com/public_html` is a symlink to `staging-app/public` only. Staging has its
+  own `.env`, `APP_KEY` and database.
+- Rejected: staging as a subdomain. Hostinger forces a subdomain's root under
+  `domains/govoyza.com/public_html/…`, i.e. inside production. Rejected: parked domains
+  (unverified for same-domain subdomains) and separate websites for partner/admin (+2 slots, two more
+  symlinks for no gain).
+- Slot usage on the Business plan: **2 websites** (govoyza.com, staging.govoyza.com) plus 2 subdomains.
+- Real server details live only in GitHub secrets and server `.env` files; docs use `uXXXXXXX`/`HOST`/`PORT`.
