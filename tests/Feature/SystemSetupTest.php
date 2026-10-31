@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use LogicException;
 use Tests\TestCase;
 
@@ -44,7 +45,7 @@ class SystemSetupTest extends TestCase
 
     public function test_audit_logs_are_immutable_and_mask_secrets(): void
     {
-        $log = app(\App\Services\Audit\AuditLogger::class)->log('test.action', new: ['password' => 'x', 'name' => 'ok']);
+        $log = app(AuditLogger::class)->log('test.action', new: ['password' => 'x', 'name' => 'ok']);
 
         $this->assertSame('***', $log->new_values['password']);
         $this->assertSame('ok', $log->new_values['name']);

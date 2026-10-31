@@ -5,6 +5,7 @@ namespace Tests\Feature\Auth;
 use App\Enums\UserStatus;
 use App\Models\AuditLog;
 use App\Models\User;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Foundation\Http\Middleware\ValidateCsrfToken;
 use Tests\TestCase;
@@ -89,7 +90,7 @@ class LoginTest extends TestCase
 
     public function test_csrf_middleware_protects_login(): void
     {
-        $middleware = app(\Illuminate\Contracts\Http\Kernel::class)->getMiddlewareGroups()['web'];
+        $middleware = app(Kernel::class)->getMiddlewareGroups()['web'];
 
         $csrf = class_exists(PreventRequestForgery::class) ? PreventRequestForgery::class : ValidateCsrfToken::class;
         $this->assertContains($csrf, $middleware);
