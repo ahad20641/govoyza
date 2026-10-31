@@ -1,0 +1,127 @@
+name: Test & Deploy to Hostinger
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: govoyza_test
+          MYSQL_ROOT_PASSWORD: root
+        ports: ["3306:3306"]
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.4"
+          extensions: mbstring, intl, bcmath, gd, zip, pdo_mysql, exif
+          coverage: none
+      - name: Skip if Laravel app not created yet
+        id: guard
+        run: |
+          if [ -f artisan ]; then echo "app=yes" >> "$GITHUB_OUTPUT"; else echo "app=no" >> "$GITHUB_OUTPUT"; echo "No Laravel app yet — skipping."; fi
+      - if: steps.guard.outputs.app == 'yes'
+        run: composer install --prefer-dist --no-interaction --no-progress
+      - if: steps.guard.outputs.app == 'yes'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: npm
+      - if: steps.guard.outputs.app == 'yes'
+        run: npm ci && npm run build
+      - if: steps.guard.outputs.app == 'yes'
+        name: Prepare env
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+      - if: steps.guard.outputs.app == 'yes'
+        name: Code style
+        run: ./vendor/bin/pint --test
+      - if: steps.guard.outputs.app == 'yes'
+        name: Tests
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: govoyza_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+        run: php artisan test
+      - if: steps.guard.outputs.app == 'yes'
+        name: Dependency audit
+        run: composer audit --no-dev || true
+
+  deploy:
+    needs: test
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    environment: ${{ github.ref_name == 'main' && 'production' || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip if Laravel app not created yet
+        id: guard
+        run: |
+          if [ -f artisan ]; then echo "app=yes" >> "$GITHUB_OUTPUT"; else echo "app=no" >> "$GITHUB_OUTPUT"; fi
+      - if: steps.guard.outputs.app == 'yes'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "26"
+          cache: npm
+      - if: steps.guard.outputs.app == 'yes'
+        name: Build front-end assets (Hostinger shared has no reliable Node)
+        run: npm ci && npm run build
+      - if: steps.guard.outputs.app == 'yes'
+        name: Pick target
+        id: target
+        run: |
+          if [ "${{ github.ref_name }}" = "main" ]; then
+            echo "path=${{ secrets.PROD_APP_PATH }}" >> "$GITHUB_OUTPUT"
+            echo "url=${{ secrets.PROD_URL }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=${{ secrets.STAGING_APP_PATH }}" >> "$GITHUB_OUTPUT"
+            echo "url=${{ secrets.STAGING_URL }}" >> "$GITHUB_OUTPUT"
+          fi
+      - if: steps.guard.outputs.app == 'yes'
+        name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.HOSTINGER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.HOSTINGER_SSH_PORT }}" "${{ secrets.HOSTINGER_SSH_HOST }}" >> ~/.ssh/known_hosts
+      - if: steps.guard.outputs.app == 'yes'
+        name: Sync code
+        run: |
+          rsync -az --delete \
+            --exclude='.git' --exclude='.github' --exclude='.env' --exclude='storage/' \
+            --exclude='node_modules' --exclude='tests' --exclude='vendor' \
+            --exclude='memory' --exclude='planning' --exclude='.claude' \
+            -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} -i ~/.ssh/deploy_key" \
+            ./ "${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ steps.target.outputs.path }}/"
+      - if: steps.guard.outputs.app == 'yes'
+        name: Post-deploy on server
+        run: |
+          ssh -p "${{ secrets.HOSTINGER_SSH_PORT }}" -i ~/.ssh/deploy_key \
+            "${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}" \
+            "bash ${{ steps.target.outputs.path }}/deploy/post-deploy.sh ${{ steps.target.outputs.path }}"
+      - if: steps.guard.outputs.app == 'yes'
+        name: Health check
+        run: |
+          for i in 1 2 3 4 5; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "${{ steps.target.outputs.url }}/up" || true)
+            [ "$code" = "200" ] && echo "Healthy" && exit 0
+            sleep 5
+          done
+          echo "Health check failed (last code: $code)"; exit 1

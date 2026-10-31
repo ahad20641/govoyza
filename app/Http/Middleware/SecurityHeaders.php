@@ -32,6 +32,15 @@ class SecurityHeaders
             $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
+        $privateDomains = [
+            config('govoyza.domains.partner'),
+            config('govoyza.domains.admin'),
+        ];
+
+        if (in_array($request->getHost(), $privateDomains, true)) {
+            $response->headers->set('X-Robots-Tag', 'noindex');
+        }
+
         return $response;
     }
 }
