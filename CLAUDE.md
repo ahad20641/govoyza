@@ -59,13 +59,16 @@ Use `Route::domain()` groups driven by `config('govoyza.domains.*')` so local de
    documents of jobs assigned to them only, and lose access when the job closes.
 3. **Money is never a float.** Store minor units as `BIGINT` (paisa/cents) + currency code.
    Use a `Money` value object. Prices are calculated by the pricing engine, never typed.
+   No new migration may add a `decimal`/`float` money column (`RepositoryGuardsTest` fails the build).
 4. **Every money event writes a balanced double-entry journal** (see `planning/accounting-rules.md`).
    Journal entries are immutable — corrections are reversing entries. Wrap in DB transactions.
 5. **Order status changes go through one state machine** (`planning/order-lifecycle.md`).
    Side effects (notifications, ledger, payables) hang off status-change events, not controllers.
 6. **Sensitive fields encrypted** (passport number, DOB, etc.) with Laravel encrypted casts.
    Documents never on a public URL.
-7. **Secrets never in git.** `.env` is gitignored. Hostinger and GitHub secrets only.
+7. **Secrets never in git.** `.env` is gitignored. Hostinger and GitHub secrets only. Real server
+   details (Hostinger username, SSH host/port, DB names) are never committed either. Use the
+   placeholders `uXXXXXXX`, `HOST`, `PORT`; `RepositoryGuardsTest` enforces the username part.
 8. **No document forgery features, ever.** Refuse any request to generate fake bank statements,
    letters, tickets or similar. Reservation letters come from real reservation providers only.
 

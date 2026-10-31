@@ -29,6 +29,7 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 - [ ] **1.10 Admin review queue** — side-by-side compare with other offers for same country + visa type + nationality. Approve / Request changes (comment) / Reject. On approve: set B2C + B2B markup, public name/description, primary/backup priority, publish product. Cost increases flagged.
 - [ ] **1.11 Requirements checklist** — per-product requirement items (doc type, required, rules: max size, formats, passport validity months).
 - [ ] **1.12 Pricing engine** — `PriceCalculator` returns breakdown (service price, embassy fee pass-through, VAT, total) per channel/tier/currency. Never typed by hand. Tested with fixtures.
+  - [ ] Convert decimal money columns to `*_minor` BIGINT + `currency` with `MoneyCast`: `service_prices` (government/service/courier/other fee, discount), `agency_services` + `vendor_services` (normal/urgent/super_urgent price), `pickup_locations.courier_fee`. Remove `create_visa_catalog_tables` from `RepositoryGuardsTest::LEGACY_DECIMAL_MIGRATIONS`.
 
 ## 1D · Public site
 - [ ] **1.13 Home + visa finder** — nationality / destination / purpose search → matching products with price, processing time, requirements.
@@ -38,6 +39,7 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 
 ## 1E · Orders
 - [ ] **1.17 Order placement** — choose product, add applicants (or saved travellers), price snapshot locked on the order, checklist generated. Guest checkout creates account.
+  - [ ] Convert decimal money columns to `*_minor` BIGINT + `currency` with `MoneyCast`: `applications` (government/service/courier/other fee, discount, total_amount), `vendor_assignments.vendor_price`. Remove `create_application_tables` from `RepositoryGuardsTest::LEGACY_DECIMAL_MIGRATIONS`.
 - [ ] **1.18 Order state machine** — implement `order-lifecycle.md` exactly: allowed transitions, who may trigger each, events fired. Tested transition by transition.
 - [ ] **1.19 Document upload & review** — private `documents` disk, signed temporary URLs, versioning, admin completeness check (approve / flag item back to customer with reason).
 - [ ] **1.20 Routing & jobs** — on admin approval of completeness, create Job for primary offer (fallback to backup if primary paused/at capacity). Partner sees only order no., applicant name, assigned documents. Access revoked when job closes.
@@ -46,7 +48,9 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 
 ## 1F · Money
 - [ ] **1.23 Payment gateway layer** — `PaymentGateway` interface; SSLCommerz first (covers cards + bKash/Nagad via SSLCommerz), Stripe second. Webhook/IPN verification, idempotency keys, sandbox mode from config.
+  - [ ] Convert decimal money columns to `*_minor` BIGINT + `currency` with `MoneyCast`: `payments` (amount, refunded_amount), `payment_transactions.amount`, `deposit_requests.amount`.
 - [ ] **1.24 Ledger** — implement `accounting-rules.md`: accounts, journal entries + lines, balanced-entry guard, posting service listening to order/payment events.
+  - [ ] Convert decimal money columns to `*_minor` BIGINT + `currency` with `MoneyCast`: `ledger_accounts` (opening/current balance), `ledger_transactions` (debit, credit, balance_after), `agencies.credit_limit`. Remove `create_finance_tables` and `create_party_tables` from `RepositoryGuardsTest::LEGACY_DECIMAL_MIGRATIONS`; the list should then be empty.
 - [ ] **1.25 Invoices & receipts** — PDF (Govoyza branding only), invoice numbering per fiscal year, embassy fee shown separately, credit notes for refunds.
 - [ ] **1.26 Refunds & cancellations** — admin action with reason; gateway refund or manual; reversing journal entries.
 - [ ] **1.27 Basic reports** — P&L by month, per-order profit, supplier payables due list, export CSV.
