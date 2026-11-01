@@ -35,7 +35,8 @@ trait PromptsForNewPassword
                 $confirmation = $this->askHidden('Password again');
             } catch (RuntimeException) {
                 $this->error('This terminal cannot hide what you type, so no password was asked for.');
-                $this->line('Use --password-stdin instead. See deploy/hostinger.md, "Staff passwords".');
+                $this->line('Run it through the helper instead, e.g.: bash deploy/password.sh '.str_replace('govoyza:', '', $this->getName()).' …');
+                $this->line('See deploy/hostinger.md, "Staff passwords".');
 
                 return null;
             }
