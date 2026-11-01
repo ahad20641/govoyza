@@ -24,7 +24,7 @@ class SupplierOfferResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Offers';
+    protected static string|UnitEnum|null $navigationGroup = 'My services';
 
     protected static ?string $recordTitleAttribute = 'id';
 

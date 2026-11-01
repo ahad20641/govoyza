@@ -44,6 +44,7 @@ class PartnerPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::hex('#D4AF37'),
             ])
+            ->navigationGroups(['My services', 'Jobs', 'Money'])
             ->discoverResources(in: app_path('Filament/Partner/Resources'), for: 'App\Filament\Partner\Resources')
             ->discoverPages(in: app_path('Filament/Partner/Pages'), for: 'App\Filament\Partner\Pages')
             ->pages([
