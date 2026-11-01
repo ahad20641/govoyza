@@ -44,6 +44,9 @@
 - Claude's SSH writes to server files (e.g. `.env`) are blocked by the auto-mode permission classifier; reads work.
   Server-side edits go to the owner (File Manager) unless they add a permission rule.
 
+- A deploy that adds a package with a service provider logs `Class … not found` from `artisan down` (old `vendor/`,
+  new code). Harmless: `down` is `|| true`, so that one deploy just runs without maintenance mode.
+
 ## Filament
 - A `Route::get('/')` on the admin domain in `routes/web.php` silently replaces the panel's dashboard route
   (same host + URI). Keep `web.php` free of admin-domain routes.
