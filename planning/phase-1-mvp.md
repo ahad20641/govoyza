@@ -19,7 +19,7 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
   Done when: unit tests cover add/subtract/multiply-by-percent/rounding/conversion.
 
 ## 1B · Users and access
-- [ ] **1.5 Auth and roles** — users table with `type` (customer, agent_user, partner_user, admin). Customer sign-up with email OTP (phone OTP later). Roles/permissions (spatie/laravel-permission): Owner, Operations, Finance. Policies per model.
+- [x] **1.5 Auth and roles** — users table with `type` (customer, agent_user, partner_user, admin). Customer sign-up with email OTP (phone OTP later). Roles/permissions (spatie/laravel-permission): Owner, Operations, Finance. Policies per model.
 - [ ] **1.6 Admin console (Filament panel on admin domain)** — 2FA required, optional IP allowlist from config, audit log of every admin write (`audit_logs` table or spatie/laravel-activitylog).
 - [ ] **1.7 Partner portal (Filament panel on partner domain)** — invite-link registration, KYC upload, bank details, e-sign agreement (click-to-sign with name, timestamp, IP, agreement version), status Pending → Active by admin. 2FA required.
 

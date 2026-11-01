@@ -37,29 +37,29 @@ Route::domain(config('govoyza.domains.main'))->group(function () {
         Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
         Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
-        Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
-            ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+        Route::post('/email/verify', [EmailVerificationController::class, 'verify'])
+            ->middleware('throttle:otp-verify')->name('verification.verify');
         Route::post('/email/verification-notification', [EmailVerificationController::class, 'resend'])
-            ->middleware('throttle:6,1')->name('verification.send');
+            ->middleware('throttle:otp-send')->name('verification.send');
 
         Route::get('/account/pending', [DashboardController::class, 'pending'])->middleware('verified')->name('account.pending');
 
         Route::middleware('verified')->group(function () {
             Route::get('/dashboard', [DashboardController::class, 'redirect'])->name('dashboard');
 
-            Route::prefix('client')->name('client.')->middleware('role:client')->group(function () {
+            Route::prefix('client')->name('client.')->middleware('type:customer')->group(function () {
                 Route::get('/', [DashboardController::class, 'client'])->name('dashboard');
             });
 
-            Route::prefix('agency')->name('agency.')->middleware('role:agency')->group(function () {
+            Route::prefix('agency')->name('agency.')->middleware('type:agent_user')->group(function () {
                 Route::get('/', [DashboardController::class, 'agency'])->name('dashboard');
             });
 
-            Route::prefix('vendor')->name('vendor.')->middleware('role:vendor')->group(function () {
+            Route::prefix('vendor')->name('vendor.')->middleware('type:partner_user')->group(function () {
                 Route::get('/', [DashboardController::class, 'vendor'])->name('dashboard');
             });
 
-            Route::prefix('admin')->name('admin.')->middleware(['role:super_admin', 'can:admin.access'])->group(function () {
+            Route::prefix('admin')->name('admin.')->middleware(['type:admin', 'can:admin.access'])->group(function () {
                 Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
             });
         });

@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\RoleSlug;
 use App\Enums\UserStatus;
+use App\Enums\UserType;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,6 +23,7 @@ class UserFactory extends Factory
     {
         return [
             'role_id' => fn () => Role::forSlug(RoleSlug::Client)->id,
+            'type' => UserType::Customer,
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
@@ -33,12 +35,22 @@ class UserFactory extends Factory
 
     public function role(RoleSlug $role): static
     {
-        return $this->state(fn () => ['role_id' => Role::forSlug($role)->id]);
+        return $this->state(fn () => ['role_id' => Role::forSlug($role)->id, 'type' => $role->userType()]);
     }
 
-    public function superAdmin(): static
+    public function owner(): static
     {
-        return $this->role(RoleSlug::SuperAdmin);
+        return $this->role(RoleSlug::Owner);
+    }
+
+    public function operations(): static
+    {
+        return $this->role(RoleSlug::Operations);
+    }
+
+    public function finance(): static
+    {
+        return $this->role(RoleSlug::Finance);
     }
 
     public function agency(): static

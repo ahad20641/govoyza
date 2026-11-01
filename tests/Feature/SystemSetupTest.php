@@ -38,7 +38,7 @@ class SystemSetupTest extends TestCase
             ->assertSuccessful();
 
         $admin = User::firstWhere('email', 'ops@govoyza.test');
-        $this->assertTrue($admin->isSuperAdmin());
+        $this->assertTrue($admin->isOwner());
         $this->assertTrue($admin->hasVerifiedEmail());
         $this->assertTrue(AuditLog::where('action', 'admin.created_via_cli')->exists());
     }

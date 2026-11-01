@@ -27,6 +27,7 @@ trap '$PHP artisan up || true' EXIT
 $COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader
 
 $PHP artisan migrate --force
+$PHP artisan govoyza:sync-permissions   # idempotent: roles + config/permissions.php
 $PHP artisan storage:link 2>/dev/null || true
 $PHP artisan optimize:clear
 $PHP artisan optimize          # config, routes, views, events cache

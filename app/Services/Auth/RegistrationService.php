@@ -7,7 +7,6 @@ use App\Enums\RoleSlug;
 use App\Enums\UserStatus;
 use App\Models\Agency;
 use App\Models\Client;
-use App\Models\Role;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use Illuminate\Auth\Events\Registered;
@@ -105,7 +104,7 @@ class RegistrationService
             'phone' => $data['phone'] ?? null,
             'password' => $data['password'],
         ]);
-        $user->role_id = Role::forSlug($role)->id;
+        $user->assignRole($role);
         $user->status = $status;
         $user->save();
 

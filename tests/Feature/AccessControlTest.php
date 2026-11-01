@@ -18,7 +18,7 @@ class AccessControlTest extends TestCase
 
     public function test_each_role_is_confined_to_its_portal(): void
     {
-        $portals = ['client' => '/client', 'agency' => '/agency', 'vendor' => '/vendor', 'super_admin' => '/admin'];
+        $portals = ['client' => '/client', 'agency' => '/agency', 'vendor' => '/vendor', 'owner' => '/admin'];
 
         foreach ($portals as $role => $own) {
             $user = User::factory()->role(RoleSlug::from($role))->create();
@@ -30,11 +30,24 @@ class AccessControlTest extends TestCase
         }
     }
 
+    public function test_all_staff_roles_use_the_admin_portal_only(): void
+    {
+        foreach (RoleSlug::staff() as $role) {
+            $staff = User::factory()->role($role)->create();
+
+            $this->actingAs($staff)->get('/admin')->assertOk();
+            $this->actingAs($staff)->get('/dashboard')->assertRedirect(route('admin.dashboard'));
+            foreach (['/client', '/agency', '/vendor'] as $path) {
+                $this->actingAs($staff)->get($path)->assertForbidden();
+            }
+        }
+    }
+
     public function test_permissions_come_from_role(): void
     {
         $client = User::factory()->create();
         $agency = User::factory()->agency()->create();
-        $admin = User::factory()->superAdmin()->create();
+        $admin = User::factory()->owner()->create();
 
         $this->assertTrue(Gate::forUser($client)->allows('applications.create'));
         $this->assertFalse(Gate::forUser($client)->allows('b2b.view_ledger'));
@@ -43,7 +56,7 @@ class AccessControlTest extends TestCase
         $this->assertTrue(Gate::forUser($agency)->allows('b2b.view_ledger'));
         $this->assertFalse(Gate::forUser($agency)->allows('agencies.manage'));
 
-        // Super Admin has full access, including permissions added later.
+        // Owner has full access, including permissions added later.
         $this->assertTrue(Gate::forUser($admin)->allows('agencies.manage'));
         $this->assertTrue(Gate::forUser($admin)->allows('anything.new'));
     }

@@ -53,3 +53,24 @@
   symlinks for no gain).
 - Slot usage on the Business plan: **2 websites** (govoyza.com, staging.govoyza.com) plus 2 subdomains.
 - Real server details live only in GitHub secrets and server `.env` files; docs use `uXXXXXXX`/`HOST`/`PORT`.
+
+## 2026-11-01 — Auth, user types and staff roles (task 1.5)
+
+- **Still no `spatie/laravel-permission`** (the task text names it): the app's own `roles`/`permissions`
+  tables already do the job (see the first entry). One role per user.
+- `users.type` (`App\Enums\UserType`: customer / agent_user / partner_user / admin) picks the portal
+  (`type:` middleware, `dashboardRoute()`); the role picks permissions. Each `RoleSlug` belongs to exactly
+  one type, and `User` throws on a mismatch. Set both with `User::assignRole()`.
+- `super_admin` renamed to **`owner`** by migration; new staff roles **`operations`** and **`finance`**.
+  Owner bypasses all checks (`Gate::before`), and only when `type = admin`. Finance has no
+  `applications.update_status` / `verify_documents` (cannot edit orders); Operations has no money permissions.
+  Pricing, staff, settings and audit log are Owner-only.
+- Existing role slugs `client` / `agency` / `vendor` and the `/client`, `/agency`, `/vendor` routes stay
+  for now; renaming them belongs to the portal tasks (1.7, 1.22).
+- **Email OTP replaces signed verification links** for every account type (one flow). 6 digits, HMAC-SHA256
+  with `APP_KEY` bound to user + purpose (`Hashing::otp`), 10-minute TTL, single use, 5 wrong guesses kill a
+  code, a new code deletes the old one. Route limits: verify 5/min + 30/h, resend 2/min + 10/h per user.
+  The code email is sent synchronously, not queued, because the database queue only runs once a minute.
+- Policies live in `app/Policies` (auto-discovered); Country/Nationality/District share `ReferenceDataPolicy`.
+- `deploy/post-deploy.sh` now runs `govoyza:sync-permissions` after `migrate`, so new roles and
+  permissions reach staging/production without a manual step.

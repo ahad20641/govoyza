@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsureAccountActive;
 use App\Http\Middleware\EnsureRole;
+use App\Http\Middleware\EnsureUserType;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -21,6 +22,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->alias([
             'role' => EnsureRole::class,
+            'type' => EnsureUserType::class,
         ]);
         $middleware->redirectGuestsTo(fn () => route('login'));
         $middleware->redirectUsersTo(fn (Request $r) => route($r->user()->dashboardRoute()));
