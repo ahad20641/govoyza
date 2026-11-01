@@ -31,6 +31,7 @@ $PHP artisan filament:assets    # Filament's CSS/JS/fonts into public/ (gitignor
 
 $PHP artisan migrate --force
 $PHP artisan govoyza:sync-permissions   # idempotent: roles + config/permissions.php
+$PHP artisan db:seed --class=ReferenceDataSeeder --force   # idempotent: countries, nationalities, visa types
 
 # PHP's symlink() is disabled too, so `artisan storage:link` can't work; the shell can.
 [ -L public/storage ] || ln -s ../storage/app/public public/storage
