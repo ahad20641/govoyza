@@ -19,16 +19,21 @@ if [ ! -f .env ]; then
   exit 1
 fi
 
-mkdir -p storage/app/private/documents storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
+mkdir -p storage/app/public storage/app/private/documents storage/framework/{cache,sessions,views} storage/logs bootstrap/cache
 
 $PHP artisan down --retry=30 || true
 trap '$PHP artisan up || true' EXIT
 
-$COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+# Hostinger disables proc_open, so Composer can't run its scripts; run package discovery directly.
+$COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
+$PHP artisan package:discover --ansi
 
 $PHP artisan migrate --force
 $PHP artisan govoyza:sync-permissions   # idempotent: roles + config/permissions.php
-$PHP artisan storage:link 2>/dev/null || true
+
+# PHP's symlink() is disabled too, so `artisan storage:link` can't work; the shell can.
+[ -L public/storage ] || ln -s ../storage/app/public public/storage
+
 $PHP artisan optimize:clear
 $PHP artisan optimize          # config, routes, views, events cache
 $PHP artisan queue:restart
