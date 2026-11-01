@@ -125,8 +125,34 @@ becomes a symlink to that app's Laravel `public/` folder.
 See `.github/workflows/deploy.yml` and `deploy/post-deploy.sh`:
 1. CI: `composer install`, `npm ci && npm run build`, run tests + Pint.
 2. rsync code to the server (excluding `.env`, `storage/`, `.git`, `node_modules`, `tests`).
-3. On the server: maintenance mode → `composer install --no-dev` → `migrate --force` → cache config/routes/views/events → `queue:restart`.
+3. On the server: maintenance mode → `composer install --no-dev` → `migrate --force` → `govoyza:sync-permissions` → cache config/routes/views/events → `queue:restart`.
 4. Health check: `curl $URL/up` must return 200, else the job fails.
+
+## Changing `.env` on the server
+Config is cached on every deploy, so a `.env` edit (for example `MAIL_PASSWORD` via File Manager)
+does nothing until you rebuild the cache:
+```bash
+cd ~/domains/govoyza.com/staging-app && php artisan config:cache
+```
+
+## Staff passwords (create-admin, reset-password)
+Hostinger disables `shell_exec()`, so PHP can't hide what you type, and a normal prompt would show the
+password on screen. `govoyza:create-admin` and `govoyza:reset-password` refuse to prompt there. Instead,
+the shell's `read -s` hides the input and passes it in with `--password-stdin` (two lines: the password and
+its confirmation). Nothing ends up in shell history or on screen.
+
+```bash
+cd ~/domains/govoyza.com/staging-app        # production: ~/domains/govoyza.com/app
+read -rs -p 'New password: ' P1; echo; read -rs -p 'Again: ' P2; echo
+printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:reset-password you@example.com --password-stdin; unset P1 P2
+```
+New staff account: same first two lines, then
+`printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:create-admin --name="Name" --email=you@example.com --role=owner --password-stdin; unset P1 P2`.
+Staff passwords need 12+ characters with upper and lower case, a number and a symbol.
+`reset-password` signs the account out of every session.
+
+## Test email
+After setting `MAIL_PASSWORD` and running `config:cache`: `php artisan govoyza:send-test-email you@example.com`.
 
 ## Rollback
 Re-run the previous successful workflow run in GitHub Actions ("Re-run all jobs") or

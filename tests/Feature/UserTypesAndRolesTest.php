@@ -97,16 +97,18 @@ class UserTypesAndRolesTest extends TestCase
     public function test_create_admin_command_creates_staff_roles_only(): void
     {
         $this->artisan('govoyza:create-admin', [
-            '--name' => 'Fin', '--email' => 'fin@govoyza.test', '--role' => 'finance', '--password' => 'Str0ng!Passw0rd',
-        ])->assertSuccessful();
+            '--name' => 'Fin', '--email' => 'fin@govoyza.test', '--role' => 'finance',
+        ])->expectsQuestion('Password (hidden)', 'Str0ng!Passw0rd')
+            ->expectsQuestion('Password again', 'Str0ng!Passw0rd')
+            ->assertSuccessful();
 
         $finance = User::firstWhere('email', 'fin@govoyza.test');
         $this->assertSame(UserType::Admin, $finance->type);
         $this->assertTrue($finance->hasRole(RoleSlug::Finance));
 
         $this->artisan('govoyza:create-admin', [
-            '--name' => 'X', '--email' => 'x@govoyza.test', '--role' => 'client', '--password' => 'Str0ng!Passw0rd',
-        ])->assertFailed();
+            '--name' => 'X', '--email' => 'x@govoyza.test', '--role' => 'client',
+        ])->assertFailed(); // rejected before any password is asked for
         $this->assertNull(User::firstWhere('email', 'x@govoyza.test'));
     }
 }
