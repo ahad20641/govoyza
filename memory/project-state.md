@@ -41,7 +41,9 @@ Real host, port, user and DB names live only in GitHub secrets and server `.env`
 - [ ] Payment gateway sandbox credentials (SSLCommerz, bKash, Nagad, Stripe)
 - [ ] Mailbox `no-reply@govoyza.com` (Hostinger SMTP). Staging `.env` already has every other `MAIL_*` value; owner adds
   `MAIL_PASSWORD`, then run `php artisan config:cache`. Claude sends a test (`govoyza:send-test-email`) once owner confirms
-- [ ] Task 1.2b (staging password + coming-soon page): owner to confirm scope; the coming-soon page touches production
+- [ ] 1.2b: turn on the staging password with `govoyza:staging-password --password-stdin` (steps in
+  `deploy/hostinger.md`, "Staging password"). Code is deployed; the gate stays off until a hash is set.
+  The coming-soon page is already live on govoyza.com (approved 2026-11-01)
 - [ ] Phase 0 business items. See `planning/phase-0-foundations.md`
 
 ## Open questions
@@ -50,6 +52,6 @@ Real host, port, user and DB names live only in GitHub secrets and server `.env`
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. 1.2b Staging password + coming-soon page (once scope is confirmed)
+1. Tick 1.2b once staging returns 401 without the password (owner sets it)
 2. 1.6 Admin console on Filament 5.11 (decided; see decisions.md), with the exchange-rate editor
 3. 1.7 Partner portal (Filament)

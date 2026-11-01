@@ -3,6 +3,16 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (password fix, Filament decision, 1.2b)
+- `create-admin` echoed passwords on Hostinger (`secret()` falls back to visible input without `shell_exec`).
+  Fixed in PR #4: hidden prompts with no fallback, asked twice, `--password-stdin`. Added `reset-password` and `send-test-email`.
+- Merged PRs #3–#5 into `develop` (Claude may now merge into develop after CI; main/production need the owner's OK, per CLAUDE.md).
+  PR #2's work had missed `develop` and came in via #3. Old branches deleted.
+- Decided: Filament 5.11 for admin and partner panels (intl present on Hostinger).
+- 1.2b: staging Basic Auth gate (PR #5, off until the owner sets the password); coming-soon page live on govoyza.com,
+  Hostinger placeholder backed up to `~/domains/govoyza.com/public_html_placeholder_backup/`.
+- Next: owner sets the staging password, changes their admin password, and adds MAIL_PASSWORD; then 1.6.
+
 ## 2026-11-01 (task 1.5 auth and roles)
 - Added `users.type` and staff roles. `super_admin` was renamed to `owner` by migration; new `operations` and `finance` roles are least privilege. Each role maps to one type, and the model enforces it.
 - Replaced signed email-verification links with 6-digit OTP codes. Only an HMAC is stored, with a 10-minute TTL, single use, a 5-guess cap and rate limits.
