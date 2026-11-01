@@ -39,6 +39,16 @@
   - Without `shell_exec`, Laravel's `secret()` **shows** the password (its hidden-input fallback). Use
     `PromptsForNewPassword` (fallback off) and `--password-stdin` with the shell's `read -s`.
 - Config is cached on deploy: an `.env` edit on the server needs `php artisan config:cache` to take effect.
+- Don't give the owner a block of `read -s …` lines to paste: `read` takes the next pasted line as its input. Give
+  one-line commands (`bash deploy/password.sh …`).
+- Claude's SSH writes to server files (e.g. `.env`) are blocked by the auto-mode permission classifier; reads work.
+  Server-side edits go to the owner (File Manager) unless they add a permission rule.
+
+## Filament
+- A `Route::get('/')` on the admin domain in `routes/web.php` silently replaces the panel's dashboard route
+  (same host + URI). Keep `web.php` free of admin-domain routes.
+- Audit/IP middleware must be `isPersistent: true` (or keyed off `Filament::getCurrentPanel()`), or Livewire update
+  requests, where saves happen, skip them.
 - On Windows, a bare `python` in a command can hang (Store alias). Don't use it; use PHP or the file tools.
   - laravel-backup's `mysqldump` (task 1.31) needs `exec`/`proc_open`, so plan another way to dump the DB.
 - A secret piped through PowerShell 5.1 (`Get-Content -Raw | gh secret set`) got corrupted

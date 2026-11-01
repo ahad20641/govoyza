@@ -3,6 +3,15 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.6 admin console)
+- Owner's first password steps failed: pasting the `read`/`printf` block made `read` take the next pasted line.
+  Added `deploy/password.sh` (reads from /dev/tty, one line to run). PR #6.
+- Built 1.6 on Filament 5.11 (PR #7): required TOTP 2FA, IP allowlist, audit of every panel write, exchange-rate and
+  audit-log resources. Staff signing in on the public site go to the admin login. 109 tests.
+- Staging has no admin subdomain, so the panel path is configurable (`staging.govoyza.com/admin`). The owner sets the
+  two `.env` lines; Claude's server-file writes are blocked by the permission classifier.
+- Next: 1.7 partner portal.
+
 ## 2026-11-01 (password fix, Filament decision, 1.2b)
 - `create-admin` echoed passwords on Hostinger (`secret()` falls back to visible input without `shell_exec`).
   Fixed in PR #4: hidden prompts with no fallback, asked twice, `--password-stdin`. Added `reset-password` and `send-test-email`.

@@ -5,53 +5,52 @@
 
 **Last updated:** 2026-11-01
 **Current phase:** Phase 1 — MVP (see `planning/phase-1-mvp.md`)
-**Current task:** 1.6 Admin console. 1.4, 1.2 config and 1.5 are merged into `develop` and live on staging; 1.2 production is still to do
-**Branch:** `develop` (no open PRs). Start 1.6 from `develop`
+**Current task:** 1.7 Partner portal. 1.6 is merged (PR #7). 1.2 (production half) and 1.2b wait on the owner
+**Branch:** `develop` (no open PRs)
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
-- Laravel 13 app: auth, dashboard, admin/security scaffolding, domain-aware routing, base branding
-- Money (PR #1): `Money`, `Currency` enum (BDT/USD/EUR), `MoneyCast`, `exchange_rates` + `CurrencyConverter`.
-  No admin UI for rates yet (1.6)
-- Repo guards (PR #2): env-template keys must be read in config, no new decimal money columns, no real Hostinger username
-- Auth (PR #3): `users.type` picks the portal, the role picks permissions (one type per role). Staff roles
-  Owner / Operations / Finance (least privilege). Email verification by 6-digit OTP. Policies in `app/Policies`.
-  Post-deploy runs `govoyza:sync-permissions`
-- Local PHP 8.4 / SQLite: 80 tests pass, Pint passes
-- GitHub repo `ahad20641/govoyza` is **public**. Secret scan of the full history on 2026-11-01 was clean
+- Laravel 13 app: auth, domain-aware routing, base branding, security headers
+- Money: `Money`, `Currency` (BDT/USD/EUR), `MoneyCast`, `exchange_rates` + `CurrencyConverter`
+- Repo guards: env-template keys must be read in config, no new decimal money columns, no real Hostinger username
+- Auth: `users.type` picks the portal, role picks permissions. Staff Owner / Operations / Finance. Email OTP.
+  Policies in `app/Policies`. CLI: `create-admin`, `reset-password`, `staging-password`, `send-test-email`
+  (passwords via `bash deploy/password.sh …` on Hostinger)
+- Admin console (1.6): Filament 5.11, required TOTP 2FA, optional `GOVOYZA_ADMIN_IPS`, every panel write audited.
+  Resources: exchange rates (add-only), audit log (read-only). Production `admin.govoyza.com/`, staging `staging.govoyza.com/admin`
+- Staging gate (Basic Auth, off until a hash is set) and the coming-soon page on govoyza.com
+- Local PHP 8.4 / SQLite: 109 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
 - Inherited schema still has `decimal` money columns, converted per task (checkboxes on 1.12/1.17/1.23/1.24)
 
 ## Environments
 | Env | URL | Branch | Status |
 |---|---|---|---|
 | Local | govoyza.test | any | SQLite; migrations and tests pass |
-| Staging | staging.govoyza.com | `develop` | **Live.** Deployed by CI on push; `/up` returns 200; APP_KEY set; cron every minute (Hostinger API) |
-| Production | govoyza.com (+ partner., admin.) | `main` | Hostinger placeholder page. Not deployed, on purpose |
+| Staging | staging.govoyza.com | `develop` | **Live.** CI deploys on push; `/up` 200; cron every minute |
+| Production | govoyza.com (+ partner., admin.) | `main` | Static coming-soon page in `public_html`. App not deployed, on purpose |
 
 Server layout matches `deploy/hostinger.md`: `app/` and `staging-app/` sit outside any `public_html`.
-Staging's `public_html` is a symlink to `staging-app/public`. Production's `public_html` is **not yet**
-a symlink; swap it at production's first deploy. Both `.env` files exist (mode 600) with owner-typed DB passwords.
-Real host, port, user and DB names live only in GitHub secrets and server `.env` files.
+Staging's `public_html` is a symlink to `staging-app/public`. Production's `public_html` holds the coming-soon
+page; it becomes the `app/public` symlink at production's first deploy. Hostinger's placeholder is backed up in
+`~/domains/govoyza.com/public_html_placeholder_backup/`. Real server details live only in GitHub secrets and `.env` files.
 
 ## Waiting on owner
-- [ ] Owner account exists on staging, but its password was echoed on screen. Change it with
-  `govoyza:reset-password` using `--password-stdin` (steps in `deploy/hostinger.md`, "Staff passwords")
-- [ ] Delete the unused `…_govoyza_prod1` database and the old unused staging DB in hPanel (owner said they'd do it)
-- [ ] Before production: back up both `APP_KEY`s offline, then decide the go-live date. Production deploy needs your approval (required reviewer)
+- [ ] Staging `.env` (File Manager): set `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com`, add `GOVOYZA_ADMIN_PATH=admin`,
+  add `MAIL_PASSWORD`, then `php artisan config:cache`. (Claude may not write server files.)
+- [ ] Change the staging Owner password (it was echoed): `bash deploy/password.sh reset-password EMAIL`
+- [ ] 1.2b: `bash deploy/password.sh staging-password`, then Claude checks the 401 and ticks 1.2b
+- [ ] After MAIL_PASSWORD: Claude sends `govoyza:send-test-email` to the owner's admin address
+- [ ] Delete the unused `…_govoyza_prod1` database and the old unused staging DB in hPanel
+- [ ] Before production: back up both `APP_KEY`s offline, decide go-live. Merging to `main` / prod deploy needs the owner's OK
 - [ ] Payment gateway sandbox credentials (SSLCommerz, bKash, Nagad, Stripe)
-- [ ] Mailbox `no-reply@govoyza.com` (Hostinger SMTP). Staging `.env` already has every other `MAIL_*` value; owner adds
-  `MAIL_PASSWORD`, then run `php artisan config:cache`. Claude sends a test (`govoyza:send-test-email`) once owner confirms
-- [ ] 1.2b: turn on the staging password with `govoyza:staging-password --password-stdin` (steps in
-  `deploy/hostinger.md`, "Staging password"). Code is deployed; the gate stays off until a hash is set.
-  The coming-soon page is already live on govoyza.com (approved 2026-11-01)
 - [ ] Phase 0 business items. See `planning/phase-0-foundations.md`
 
 ## Open questions
-- Public frontend: plain HTML/Blade (per decisions). Confirm there's no need for Livewire or Next.js
 - Default display currency BDT; confirm USD/EUR shown alongside for international buyers
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
+- Partner portal on staging needs the same path trick as admin (`GOVOYZA_PARTNER_PATH`), decide in 1.7
 
 ## Next 3 tasks
-1. Tick 1.2b once staging returns 401 without the password (owner sets it)
-2. 1.6 Admin console on Filament 5.11 (decided; see decisions.md), with the exchange-rate editor
-3. 1.7 Partner portal (Filament)
+1. 1.7 Partner portal (Filament panel on the partner domain; invite link, KYC, bank details, e-sign, 2FA)
+2. 1.8 Reference data (countries, visa types, nationalities + seeders)
+3. 1.9 Products and supplier offers
