@@ -47,6 +47,11 @@ class Partner extends Model
         return $this->hasMany(PartnerDocument::class);
     }
 
+    public function supplierOffers(): HasMany
+    {
+        return $this->hasMany(SupplierOffer::class);
+    }
+
     public function approver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
