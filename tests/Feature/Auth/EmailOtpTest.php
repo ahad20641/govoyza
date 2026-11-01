@@ -113,7 +113,7 @@ class EmailOtpTest extends TestCase
         if ($old !== $new) {
             $this->post(route('verification.verify'), ['code' => $old])->assertSessionHasErrors('code');
         }
-        $this->post(route('verification.verify'), ['code' => $new])->assertRedirect(route('client.dashboard'));
+        $this->post(route('verification.verify'), ['code' => $new])->assertRedirect(route('account.dashboard'));
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
     }
 

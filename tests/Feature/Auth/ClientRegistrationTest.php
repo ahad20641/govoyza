@@ -47,12 +47,12 @@ class ClientRegistrationTest extends TestCase
         });
 
         // Unverified users cannot reach the dashboard.
-        $this->get('/client')->assertRedirect(route('verification.notice'));
+        $this->get('/account')->assertRedirect(route('verification.notice'));
         $this->get(route('verification.notice'))->assertOk()->assertSee('6-digit code');
 
-        $this->post(route('verification.verify'), ['code' => $code])->assertRedirect(route('client.dashboard'));
+        $this->post(route('verification.verify'), ['code' => $code])->assertRedirect(route('account.dashboard'));
         $this->assertTrue($user->fresh()->hasVerifiedEmail());
-        $this->get('/client')->assertOk();
+        $this->get('/account')->assertOk();
     }
 
     public function test_role_and_type_cannot_be_injected_through_registration(): void

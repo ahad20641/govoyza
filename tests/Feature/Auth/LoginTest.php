@@ -15,8 +15,8 @@ class LoginTest extends TestCase
     public function test_users_land_on_their_role_dashboard(): void
     {
         $cases = [
-            [User::factory()->create(), '/client'],
-            [User::factory()->agency()->create(), '/agency'],
+            [User::factory()->create(), '/account'],
+            [User::factory()->agency()->create(), '/agent'],
         ];
 
         foreach ($cases as [$user, $path]) {
@@ -81,12 +81,12 @@ class LoginTest extends TestCase
     public function test_user_suspended_mid_session_is_logged_out(): void
     {
         $user = User::factory()->create();
-        $this->actingAs($user)->get('/client')->assertOk();
+        $this->actingAs($user)->get('/account')->assertOk();
 
         $user->status = UserStatus::Suspended;
         $user->save();
 
-        $this->actingAs($user->fresh())->get('/client')->assertRedirect(route('login'));
+        $this->actingAs($user->fresh())->get('/account')->assertRedirect(route('login'));
         $this->assertGuest();
     }
 
