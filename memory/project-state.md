@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-11-01
 **Current phase:** Phase 1 — MVP (see `planning/phase-1-mvp.md`)
-**Current task:** 1.6 Admin console. 1.5 is in PR #3, 1.4 in PR #1; 1.2 is done for staging, production is still to do
-**Branch:** `feat/1.5-auth-and-roles` (PR #3 → stacked on PR #2 `chore/1.2-deploy-config` → stacked on PR #1)
+**Current task:** 1.6 Admin console. 1.4, 1.2 config and 1.5 are merged into `develop` and live on staging; 1.2 production is still to do
+**Branch:** `develop` (no open PRs). Start 1.6 from `develop`
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
@@ -34,8 +34,7 @@ a symlink; swap it at production's first deploy. Both `.env` files exist (mode 6
 Real host, port, user and DB names live only in GitHub secrets and server `.env` files.
 
 ## Waiting on owner
-- [ ] Review and merge PR #1 (1.4), then PR #2 (deploy config), then retarget PR #3 (1.5) to `develop` and merge. Merging deploys staging
-- [ ] After PR #3 is on staging: create the first staff account over SSH with `php artisan govoyza:create-admin` (you type the password)
+- [ ] Create the first staff account on staging over SSH: `php artisan govoyza:create-admin` (you type the password)
 - [ ] Delete the unused `…_govoyza_prod1` database and the old unused staging DB in hPanel (owner said they'd do it)
 - [ ] Before production: back up both `APP_KEY`s offline, then decide the go-live date. Production deploy needs your approval (required reviewer)
 - [ ] Payment gateway sandbox credentials (SSLCommerz, bKash, Nagad, Stripe)
@@ -48,6 +47,6 @@ Real host, port, user and DB names live only in GitHub secrets and server `.env`
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. Merge PRs #1, #2, #3 and check that staging redeploys green (migration renames `super_admin` → `owner`)
-2. 1.6 Admin console (admin domain; includes the exchange-rate editor). Decide Filament vs plain Blade first (decisions say "revisit Filament")
-3. 1.7 Partner portal
+1. 1.6 Admin console (admin domain; includes the exchange-rate editor). Decide Filament vs plain Blade first (decisions say "revisit Filament")
+2. 1.7 Partner portal
+3. 1.8 Reference data

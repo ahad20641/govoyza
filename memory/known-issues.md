@@ -18,6 +18,9 @@
   with the Write tool instead.
 
 ## GitHub
+- Stacked PRs: merging the bottom PR does not retarget the ones above it. PR #2 was merged into the dead
+  `feat/1.4` branch, so its work missed `develop` until PR #3 carried it in. Retarget each stacked PR to
+  `develop` *before* merging it.
 - Required reviewers on an environment need a public repo or a paid plan (Pro/Team). While the repo
   was private on Free, the API returned 422. It's now public and the `production` rule is in place.
 
