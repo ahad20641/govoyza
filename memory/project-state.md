@@ -34,11 +34,14 @@ a symlink; swap it at production's first deploy. Both `.env` files exist (mode 6
 Real host, port, user and DB names live only in GitHub secrets and server `.env` files.
 
 ## Waiting on owner
-- [ ] Create the first staff account on staging over SSH: `php artisan govoyza:create-admin` (you type the password)
+- [ ] Owner account exists on staging, but its password was echoed on screen. Change it with
+  `govoyza:reset-password` using `--password-stdin` (steps in `deploy/hostinger.md`, "Staff passwords")
 - [ ] Delete the unused `…_govoyza_prod1` database and the old unused staging DB in hPanel (owner said they'd do it)
 - [ ] Before production: back up both `APP_KEY`s offline, then decide the go-live date. Production deploy needs your approval (required reviewer)
 - [ ] Payment gateway sandbox credentials (SSLCommerz, bKash, Nagad, Stripe)
-- [ ] Transactional email provider credentials. Sign-up now needs a working mailer: without one, OTP codes never reach users
+- [ ] Mailbox `no-reply@govoyza.com` (Hostinger SMTP). Staging `.env` already has every other `MAIL_*` value; owner adds
+  `MAIL_PASSWORD`, then run `php artisan config:cache`. Claude sends a test (`govoyza:send-test-email`) once owner confirms
+- [ ] Task 1.2b (staging password + coming-soon page): owner to confirm scope; the coming-soon page touches production
 - [ ] Phase 0 business items. See `planning/phase-0-foundations.md`
 
 ## Open questions
@@ -47,6 +50,6 @@ Real host, port, user and DB names live only in GitHub secrets and server `.env`
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. 1.6 Admin console (admin domain; includes the exchange-rate editor). Decide Filament vs plain Blade first (decisions say "revisit Filament")
-2. 1.7 Partner portal
-3. 1.8 Reference data
+1. 1.2b Staging password + coming-soon page (once scope is confirmed)
+2. 1.6 Admin console on Filament 5.11 (decided; see decisions.md), with the exchange-rate editor
+3. 1.7 Partner portal (Filament)

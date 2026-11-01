@@ -36,6 +36,10 @@
 - Hostinger PHP `disable_functions` includes `proc_open`, `exec`, `shell_exec`, `system`, `popen`, `symlink`.
   - Composer can't run scripts, so use `composer install --no-scripts`, then `php artisan package:discover` (done in `post-deploy.sh`).
   - `artisan storage:link` fails, so create `public/storage` with `ln -s ../storage/app/public public/storage`; rsync excludes `/public/storage`.
+  - Without `shell_exec`, Laravel's `secret()` **shows** the password (its hidden-input fallback). Use
+    `PromptsForNewPassword` (fallback off) and `--password-stdin` with the shell's `read -s`.
+- Config is cached on deploy: an `.env` edit on the server needs `php artisan config:cache` to take effect.
+- On Windows, a bare `python` in a command can hang (Store alias). Don't use it; use PHP or the file tools.
   - laravel-backup's `mysqldump` (task 1.31) needs `exec`/`proc_open`, so plan another way to dump the DB.
 - A secret piped through PowerShell 5.1 (`Get-Content -Raw | gh secret set`) got corrupted
   (CI: `Load key ... error in libcrypto`). Upload files from Git Bash: `gh secret set NAME < file`.

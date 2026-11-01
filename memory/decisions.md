@@ -74,3 +74,14 @@
 - Policies live in `app/Policies` (auto-discovered); Country/Nationality/District share `ReferenceDataPolicy`.
 - `deploy/post-deploy.sh` now runs `govoyza:sync-permissions` after `migrate`, so new roles and
   permissions reach staging/production without a manual step.
+
+## 2026-11-01 — Admin console on Filament (supersedes "Not added: Filament" in the first entry)
+
+- **Filament 5.11.0** (`filament/filament:^5.11`, released 2026-10-26) for the admin console (1.6) and partner
+  portal (1.7). Install it in task 1.6 and pin the exact resolved version in `composer.lock`.
+- Why: the inherited admin is only an empty dashboard shell (`DashboardController::admin`); there is no Blade admin
+  to keep. Filament 5 supports Laravel 13, ships 2FA (google2fa), and gives tables, forms and filters for free.
+- It needs `ext-intl` (present locally and on Hostinger PHP 8.4, checked 2026-11-01) and Livewire 4. Livewire is
+  used **only inside the Filament panels**; the public site and customer/agent portals stay plain Blade.
+- Authorisation stays ours: Filament resources call the existing Policies and `config/permissions.php`.
+  No `spatie/laravel-permission`, no `filament-shield`.
