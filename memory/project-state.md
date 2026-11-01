@@ -5,7 +5,7 @@
 
 **Last updated:** 2026-11-01
 **Current phase:** Phase 1 — MVP (see `planning/phase-1-mvp.md`)
-**Current task:** 1.7 Partner portal. 1.6 is merged (PR #7). 1.2 (production half) and 1.2b wait on the owner
+**Current task:** 1.8 Reference data. 1.7 is in PR #8 (merge after CI). 1.2 (production half) and 1.2b wait on the owner
 **Branch:** `develop` (no open PRs)
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
@@ -18,8 +18,12 @@
   (passwords via `bash deploy/password.sh …` on Hostinger)
 - Admin console (1.6): Filament 5.11, required TOTP 2FA, optional `GOVOYZA_ADMIN_IPS`, every panel write audited.
   Resources: exchange rates (add-only), audit log (read-only). Production `admin.govoyza.com/`, staging `staging.govoyza.com/admin`
+- Partner portal (1.7): Filament panel `partner`, 2FA, invite-only join, KYC uploads (private), encrypted bank
+  details, click-to-sign agreement; admin Partners resource (invite / approve / suspend / download KYC). Role is
+  `partner` now (was `vendor`). Production `partner.govoyza.com/`, staging `staging.govoyza.com/partner`
 - Staging gate (Basic Auth, off until a hash is set) and the coming-soon page on govoyza.com
-- Local PHP 8.4 / SQLite: 109 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
+- Local PHP 8.4 / SQLite: 122 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
+- Legacy `vendors` / `vendor_*` tables still exist, unused by new code; retire them in 1.9/1.17/1.20/1.24
 - Inherited schema still has `decimal` money columns, converted per task (checkboxes on 1.12/1.17/1.23/1.24)
 
 ## Environments
@@ -35,8 +39,11 @@ page; it becomes the `app/public` symlink at production's first deploy. Hostinge
 `~/domains/govoyza.com/public_html_placeholder_backup/`. Real server details live only in GitHub secrets and `.env` files.
 
 ## Waiting on owner
-- [ ] Staging `.env` (File Manager): set `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com`, add `GOVOYZA_ADMIN_PATH=admin`,
-  add `MAIL_PASSWORD`, then `php artisan config:cache`. (Claude may not write server files.)
+- [ ] Staging `.env` (File Manager): set `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com` and
+  `GOVOYZA_PARTNER_DOMAIN=staging.govoyza.com`; add `GOVOYZA_ADMIN_PATH=admin`, `GOVOYZA_PARTNER_PATH=partner` and
+  `MAIL_PASSWORD`; then `php artisan config:cache`. (Claude may not write server files.)
+- [ ] Lawyer-approved **supplier agreement** text to replace the placeholder in `resources/agreements/partner-agreement.md`
+  (needed before any real partner signs)
 - [ ] Change the staging Owner password (it was echoed): `bash deploy/password.sh reset-password EMAIL`
 - [ ] 1.2b: `bash deploy/password.sh staging-password`, then Claude checks the 401 and ticks 1.2b
 - [ ] After MAIL_PASSWORD: Claude sends `govoyza:send-test-email` to the owner's admin address
@@ -48,9 +55,8 @@ page; it becomes the `app/public` symlink at production's first deploy. Hostinge
 ## Open questions
 - Default display currency BDT; confirm USD/EUR shown alongside for international buyers
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
-- Partner portal on staging needs the same path trick as admin (`GOVOYZA_PARTNER_PATH`), decide in 1.7
 
 ## Next 3 tasks
-1. 1.7 Partner portal (Filament panel on the partner domain; invite link, KYC, bank details, e-sign, 2FA)
-2. 1.8 Reference data (countries, visa types, nationalities + seeders)
-3. 1.9 Products and supplier offers
+1. 1.8 Reference data (countries, visa types, nationalities + seeders)
+2. 1.9 Products and supplier offers (on `partners`)
+3. 1.10 Admin review queue

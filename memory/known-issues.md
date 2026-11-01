@@ -50,6 +50,9 @@
 ## Filament
 - A `Route::get('/')` on the admin domain in `routes/web.php` silently replaces the panel's dashboard route
   (same host + URI). Keep `web.php` free of admin-domain routes.
+- Widgets load lazily by default (a second Livewire request), so their content isn't in the first HTML. Set
+  `protected static bool $isLazy = false;` when a test or the page needs it straight away.
+- `pluck()` on an enum-cast column returns enum objects, not strings. Compare enums, not `->value`.
 - Audit/IP middleware must be `isPersistent: true` (or keyed off `Filament::getCurrentPanel()`), or Livewire update
   requests, where saves happen, skip them.
 - On Windows, a bare `python` in a command can hang (Store alias). Don't use it; use PHP or the file tools.

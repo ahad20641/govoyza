@@ -3,6 +3,13 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.7 partner portal)
+- Built the partner portal as a second Filament panel: invite-only join, KYC uploads, encrypted bank details,
+  click-to-sign agreement, admin approve/suspend/reactivate, audited KYC downloads. PR #8. 122 tests.
+- Renamed role `vendor` → `partner` (and `vendors.manage` → `partners.manage`); kept legacy vendor tables for now.
+- The agreement text is a marked placeholder until the owner's lawyer provides the real one.
+- Next: 1.8 reference data.
+
 ## 2026-11-01 (task 1.6 admin console)
 - Owner's first password steps failed: pasting the `read`/`printf` block made `read` take the next pasted line.
   Added `deploy/password.sh` (reads from /dev/tty, one line to run). PR #6.
