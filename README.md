@@ -2,7 +2,7 @@
 
 Laravel 13 · PHP 8.4+ · MySQL 8 · plain HTML/CSS/JS front end (no build step required).
 
-Three portals — **B2C Client**, **B2B Travel Agency**, **Super Admin** (plus a Vendor role) — built in the
+Three portals — **B2C Client**, **B2B Travel Agency**, **Admin** (Owner / Operations / Finance; plus a Vendor role) — built in the
 15 phases defined in the product spec.
 
 ## Build status
@@ -26,7 +26,7 @@ composer install
 cp .env.example .env          # then fill in DB_*, MAIL_*, APP_URL
 php artisan key:generate
 php artisan migrate --seed    # creates tables + roles, permissions, default settings (no users)
-php artisan govoyza:create-admin   # first Super Admin — prompted for a strong password
+php artisan govoyza:create-admin   # first Owner — prompted for a strong password
 php artisan serve
 ```
 
@@ -36,7 +36,7 @@ There is **no default admin account or password** anywhere in the code. The seed
 
 | Command | Purpose |
 |---|---|
-| `php artisan govoyza:create-admin` | Create a Super Admin (min 12 chars, mixed case, number, symbol) |
+| `php artisan govoyza:create-admin [--role=operations]` | Create a staff account: `owner` (default), `operations` or `finance` (min 12 chars, mixed case, number, symbol) |
 | `php artisan govoyza:sync-permissions` | Re-sync roles + `config/permissions.php` after adding permissions |
 | `php artisan test` | Run the test suite (SQLite in-memory) |
 
@@ -58,16 +58,18 @@ Deliberate deviations from the suggested table list:
 - Added `districts`, `application_drafts`, `chat_participants`, `agency_documents`, `agency_vendor` — required by the spec's rules (district drop-off, pay-before-create, chat access control, agency verification, vendor assignment).
 
 **Access control**
-- Roles: `super_admin`, `client`, `agency`, `vendor`. Permissions are defined in `config/permissions.php` and synced to the DB.
-- `Gate::before` grants Super Admin everything; other roles get only their role's permissions. Record-level ownership is handled by Policies (from Phase 3).
-- `role:` route middleware confines each portal; `EnsureAccountActive` logs out suspended users immediately and confines pending agencies to a status page.
-- `role_id` and `status` are not mass-assignable — registration can't escalate privileges (tested).
+- Every user has a `type` (`customer`, `agent_user`, `partner_user`, `admin`) that picks the portal, and one role that picks the permissions. Each role belongs to exactly one type (`RoleSlug::userType()`); the `User` model refuses a mismatch.
+- Roles: staff `owner`, `operations`, `finance`, plus `client`, `agency`, `vendor`. Permissions are defined in `config/permissions.php` and synced to the DB (also on every deploy).
+- `Gate::before` grants Owner everything. Operations runs orders, documents, partners and the catalogue but has no money access; Finance handles payments, refunds, ledger, rates and reports but cannot edit orders.
+- Record-level access is in `app/Policies` (own client profile, own agency and its documents, vendors hidden from all but Operations, append-only rates and audit log).
+- `type:` route middleware confines each portal; `EnsureAccountActive` logs out suspended users immediately and confines pending agencies to a status page.
+- `role_id`, `type` and `status` are not mass-assignable — registration can't escalate privileges (tested).
 
 **Authentication**
-- Client registration → email verification → client dashboard
-- Agency registration with business details + documents (trade license, owner ID, optional TIN) → email verification → *pending approval* until a Super Admin approves (approval UI lands in Phase 11)
+- Client registration → 6-digit email code → client dashboard. Codes are stored as an HMAC only, expire after 10 minutes, work once, and die after 5 wrong guesses; verify and resend are rate-limited
+- Agency registration with business details + documents (trade license, owner ID, optional TIN) → email code → *pending approval* until staff with `agencies.manage` approve (approval UI lands in Phase 11)
 - Login: 5 failed attempts per email+IP → 15-minute lockout; session regenerated on login; last login time/IP recorded
-- Forgot/reset password with no user enumeration; signed, throttled verification links
+- Forgot/reset password with no user enumeration
 - Strong password policy in production (10+ chars, mixed case, numbers, symbols, breach check)
 
 **Security baseline**

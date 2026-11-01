@@ -12,6 +12,11 @@
   (`GOVOYZA_DOMAIN_PUBLIC/_PARTNER/_ADMIN`, `GOVOYZA_DEFAULT_CURRENCY` vs `GOVOYZA_DOMAIN`,
   `GOVOYZA_PARTNER_DOMAIN`, `GOVOYZA_ADMIN_DOMAIN`, `GOVOYZA_CURRENCY`). Fix the template before writing server `.env` files (task 1.2).
 
+## Tooling
+- In this Windows Bash tool, a long command with several quoted heredocs (`<<'EOF'`) holding PHP code can
+  fail to parse ("unexpected EOF while looking for matching `'`"), and then nothing in it runs. Write PHP files
+  with the Write tool instead.
+
 ## GitHub
 - Required reviewers on an environment need a public repo or a paid plan (Pro/Team). While the repo
   was private on Free, the API returned 422. It's now public and the `production` rule is in place.
@@ -22,8 +27,27 @@
   Move each table to `*_minor` + `currency` with `MoneyCast` when its task rebuilds it (1.12, 1.17, 1.23, 1.24).
   New tables must use `MoneyCast` from the start.
 
-- Subdomains created in hPanel/API default to `domains/<main>/public_html/<sub>`, inside the main site's web root.
-  For a separate app (staging), give the subdomain a folder outside `public_html`. Use the public directory only for same-app hosts (partner/admin).
+- A subdomain's web root is always under `domains/<main>/public_html/…`. The API rejects `..`, and a custom
+  folder name still lands inside `public_html`. So a separate app (staging) must be its own *website*,
+  never a subdomain. Subdomains are only for same-app hosts (partner/admin, root = `public_html`).
+- Hostinger PHP `disable_functions` includes `proc_open`, `exec`, `shell_exec`, `system`, `popen`, `symlink`.
+  - Composer can't run scripts, so use `composer install --no-scripts`, then `php artisan package:discover` (done in `post-deploy.sh`).
+  - `artisan storage:link` fails, so create `public/storage` with `ln -s ../storage/app/public public/storage`; rsync excludes `/public/storage`.
+  - laravel-backup's `mysqldump` (task 1.31) needs `exec`/`proc_open`, so plan another way to dump the DB.
+- A secret piped through PowerShell 5.1 (`Get-Content -Raw | gh secret set`) got corrupted
+  (CI: `Load key ... error in libcrypto`). Upload files from Git Bash: `gh secret set NAME < file`.
+- PowerShell 5.1 mangles `gh ... --jq '...'` and `--body` strings with quotes. Use Git Bash, or `--body-file`.
+- phpunit.xml lists a `tests/Unit` suite; if the folder is missing, `php artisan test` exits 2 before running anything (keep `tests/Unit/.gitkeep`).
+- No `crontab` command on Hostinger shared hosting. Add cron jobs through the Hostinger API
+  (`hosting_cron-jobs_create`) or hPanel → Advanced → Cron Jobs.
+- **Never upload files into `public_html` by hand.** Anything there can be downloaded by anyone
+  (a zip with a SQL dump was public at govoyza.com/… until deleted). Uploads go outside the web roots, and code arrives only via CI.
+- A server `.env` value containing `$` must be in **single quotes** (`DB_PASSWORD='pa$$word'`).
+  Unquoted or double-quoted, Laravel's dotenv expands `$name` as a variable and the password silently breaks.
+- nano: Ctrl+X alone discards edits unless you answer `Y`; save with Ctrl+O, Enter first. Verify
+  a secret was saved by checking its length over SSH, never by printing it.
+- The owner sometimes pastes template placeholders (`HOST_HERE`, `PROD_DB_NAME`, …) instead of real values.
+  Never guess or proceed with them; ask again.
 - `deploy/post-deploy.sh` must be committed. CI rsyncs the checkout, so untracked deploy files never reach the server.
 
 ## Laravel

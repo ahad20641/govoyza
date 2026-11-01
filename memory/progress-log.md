@@ -3,6 +3,31 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.5 auth and roles)
+- Added `users.type` and staff roles. `super_admin` was renamed to `owner` by migration; new `operations` and `finance` roles are least privilege. Each role maps to one type, and the model enforces it.
+- Replaced signed email-verification links with 6-digit OTP codes. Only an HMAC is stored, with a 10-minute TTL, single use, a 5-guess cap and rate limits.
+- Added policies for every existing model. `create-admin` takes `--role`. `post-deploy.sh` now syncs permissions.
+- Kept the app's own RBAC instead of spatie (as already decided). 80 tests pass. PR #3 is stacked on PR #2.
+- Next: owner merges #1 → #2 → #3; then 1.6 Admin console.
+
+## 2026-11-01 (staging live)
+- Server setup over SSH: `app/` and `staging-app/` folders outside `public_html`, staging web root symlinked to
+  `staging-app/public`, both `.env` files written with an empty DB_PASSWORD (owner typed it; the first nano attempt didn't save).
+- First staging deploys failed three ways, each fixed: a missing `tests/Unit` dir (exit 2), an SSH key secret
+  corrupted by the PowerShell pipe (re-uploaded from Bash), and Hostinger's disabled `proc_open`/`symlink`
+  (`--no-scripts` + `package:discover`, and `ln -s` for storage). The fixes went straight to `develop`.
+- Staging is now live: CI deploy green, `/up` returns 200, APP_KEY generated, migrations ran, cron added via the API.
+  Production is untouched.
+- Found the owner's upload `govoyza-piece1.zip` (with a SQL dump) public in production's web root. The owner deleted it and it now 404s. A scan found nothing else risky in the web roots.
+- Next: merge PRs #1/#2, then 1.5 Auth and roles.
+
+## 2026-11-01 (task 1.2 deploy config)
+- Redacted the Hostinger username from all unpushed history (filter-branch on `origin/develop..`) before the first push; pushed 1.4 as PR #1.
+- Staging moved from a subdomain to a separate website (`staging.govoyza.com`). Partner/admin stay subdomains with root = `public_html`. Decision recorded; `deploy/hostinger.md` rewritten with placeholders only. `STAGING_APP_PATH` secret set.
+- Fixed the env template names. Added `EnvTemplateTest` and `RepositoryGuardsTest` (no new decimal money columns, no real Hostinger username in the repo). 58 tests pass.
+- Added per-task "convert decimal money columns" checkboxes to 1.12/1.17/1.23/1.24.
+- Next: owner sends the real SSH host/port and DB names (still placeholders), then server setup and the first staging deploy.
+
 ## 2026-11-01 (task 1.2 progress, task 1.4)
 - 1.2: committed `deploy/post-deploy.sh` (CI needs it; switched it to PHP 8.4). Created `partner`/`admin`
   subdomains and the GitHub `staging`/`production` environments; the required reviewer was accepted once the repo went public.

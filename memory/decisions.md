@@ -35,3 +35,42 @@
   pair, the inverse pair (1/rate) is used.
 - The buffer % always *increases* the converted amount (a safety margin on selling prices).
   `CurrencyConverter::convert(..., withBuffer: false)` gives the raw rate for reports.
+
+## 2026-11-01 — Hostinger hosting layout (task 1.2)
+
+- **Production** app in `~/domains/govoyza.com/app`; `~/domains/govoyza.com/public_html` is a
+  symlink to `app/public`.
+- **partner. / admin.** are *subdomains* of govoyza.com whose root is `public_html` itself (API flag
+  "use the website public directory"). They serve the same production app, and `Route::domain()`
+  picks the portal. Nothing is nested inside `public_html`, and they use no website slots.
+- **Staging** is a separate *website* (addon) `staging.govoyza.com`. Its app is in
+  `~/domains/govoyza.com/staging-app` (outside any `public_html`), and
+  `~/domains/staging.govoyza.com/public_html` is a symlink to `staging-app/public` only. Staging has its
+  own `.env`, `APP_KEY` and database.
+- Rejected: staging as a subdomain. Hostinger forces a subdomain's root under
+  `domains/govoyza.com/public_html/…`, i.e. inside production. Rejected: parked domains
+  (unverified for same-domain subdomains) and separate websites for partner/admin (+2 slots, two more
+  symlinks for no gain).
+- Slot usage on the Business plan: **2 websites** (govoyza.com, staging.govoyza.com) plus 2 subdomains.
+- Real server details live only in GitHub secrets and server `.env` files; docs use `uXXXXXXX`/`HOST`/`PORT`.
+
+## 2026-11-01 — Auth, user types and staff roles (task 1.5)
+
+- **Still no `spatie/laravel-permission`** (the task text names it): the app's own `roles`/`permissions`
+  tables already do the job (see the first entry). One role per user.
+- `users.type` (`App\Enums\UserType`: customer / agent_user / partner_user / admin) picks the portal
+  (`type:` middleware, `dashboardRoute()`); the role picks permissions. Each `RoleSlug` belongs to exactly
+  one type, and `User` throws on a mismatch. Set both with `User::assignRole()`.
+- `super_admin` renamed to **`owner`** by migration; new staff roles **`operations`** and **`finance`**.
+  Owner bypasses all checks (`Gate::before`), and only when `type = admin`. Finance has no
+  `applications.update_status` / `verify_documents` (cannot edit orders); Operations has no money permissions.
+  Pricing, staff, settings and audit log are Owner-only.
+- Existing role slugs `client` / `agency` / `vendor` and the `/client`, `/agency`, `/vendor` routes stay
+  for now; renaming them belongs to the portal tasks (1.7, 1.22).
+- **Email OTP replaces signed verification links** for every account type (one flow). 6 digits, HMAC-SHA256
+  with `APP_KEY` bound to user + purpose (`Hashing::otp`), 10-minute TTL, single use, 5 wrong guesses kill a
+  code, a new code deletes the old one. Route limits: verify 5/min + 30/h, resend 2/min + 10/h per user.
+  The code email is sent synchronously, not queued, because the database queue only runs once a minute.
+- Policies live in `app/Policies` (auto-discovered); Country/Nationality/District share `ReferenceDataPolicy`.
+- `deploy/post-deploy.sh` now runs `govoyza:sync-permissions` after `migrate`, so new roles and
+  permissions reach staging/production without a manual step.

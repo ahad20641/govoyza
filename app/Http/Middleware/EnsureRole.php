@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/** Usage: ->middleware('role:agency') or 'role:super_admin,agency' */
+/** Usage: ->middleware('role:finance') or 'role:owner,finance'. Portals use 'type:' instead. */
 class EnsureRole
 {
     public function handle(Request $request, Closure $next, string ...$roles): Response

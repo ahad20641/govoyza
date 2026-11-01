@@ -29,6 +29,7 @@ $COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader 
 $PHP artisan package:discover --ansi
 
 $PHP artisan migrate --force
+$PHP artisan govoyza:sync-permissions   # idempotent: roles + config/permissions.php
 
 # PHP's symlink() is disabled too, so `artisan storage:link` can't work; the shell can.
 [ -L public/storage ] || ln -s ../storage/app/public public/storage

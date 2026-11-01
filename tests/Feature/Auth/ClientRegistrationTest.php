@@ -3,12 +3,12 @@
 namespace Tests\Feature\Auth;
 
 use App\Enums\RoleSlug;
+use App\Enums\UserType;
 use App\Models\AuditLog;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
+use App\Notifications\EmailVerificationCode;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\URL;
 use Tests\TestCase;
 
 class ClientRegistrationTest extends TestCase
@@ -25,7 +25,7 @@ class ClientRegistrationTest extends TestCase
         ], $overrides);
     }
 
-    public function test_client_can_register_and_must_verify_email(): void
+    public function test_client_can_register_and_must_verify_email_with_a_code(): void
     {
         Notification::fake();
 
@@ -34,22 +34,36 @@ class ClientRegistrationTest extends TestCase
         $user = User::where('email', 'rahim@example.com')->firstOrFail();
         $this->assertAuthenticatedAs($user);
         $this->assertTrue($user->hasRole(RoleSlug::Client));
+        $this->assertSame(UserType::Customer, $user->type);
         $this->assertNotNull($user->client);
         $this->assertNull($user->email_verified_at);
-        Notification::assertSentTo($user, VerifyEmail::class);
         $this->assertTrue(AuditLog::where('action', 'auth.registered_client')->exists());
+
+        $code = null;
+        Notification::assertSentTo($user, EmailVerificationCode::class, function ($n) use (&$code) {
+            $code = $n->code;
+
+            return true;
+        });
 
         // Unverified users cannot reach the dashboard.
         $this->get('/client')->assertRedirect(route('verification.notice'));
+        $this->get(route('verification.notice'))->assertOk()->assertSee('6-digit code');
+
+        $this->post(route('verification.verify'), ['code' => $code])->assertRedirect(route('client.dashboard'));
+        $this->assertTrue($user->fresh()->hasVerifiedEmail());
+        $this->get('/client')->assertOk();
     }
 
-    public function test_role_cannot_be_injected_through_registration(): void
+    public function test_role_and_type_cannot_be_injected_through_registration(): void
     {
-        $admin = Role::where('slug', 'super_admin')->first();
+        $admin = Role::where('slug', 'owner')->first();
 
-        $this->post('/register/client', $this->payload(['role_id' => $admin->id, 'status' => 'active']));
+        $this->post('/register/client', $this->payload(['role_id' => $admin->id, 'type' => 'admin', 'status' => 'active']));
 
-        $this->assertTrue(User::firstWhere('email', 'rahim@example.com')->hasRole(RoleSlug::Client));
+        $user = User::firstWhere('email', 'rahim@example.com');
+        $this->assertTrue($user->hasRole(RoleSlug::Client));
+        $this->assertSame(UserType::Customer, $user->type);
     }
 
     public function test_validation_rules(): void
@@ -64,24 +78,5 @@ class ClientRegistrationTest extends TestCase
             ->assertSessionHasErrors('password');
 
         $this->assertGuest();
-    }
-
-    public function test_email_verification_link_verifies_and_redirects_to_dashboard(): void
-    {
-        $user = User::factory()->unverified()->create();
-        $url = URL::temporarySignedRoute('verification.verify', now()->addHour(), [
-            'id' => $user->id, 'hash' => sha1($user->email),
-        ]);
-
-        $this->actingAs($user)->get($url)->assertRedirect(route('client.dashboard'));
-        $this->assertTrue($user->fresh()->hasVerifiedEmail());
-    }
-
-    public function test_tampered_verification_link_is_rejected(): void
-    {
-        $user = User::factory()->unverified()->create();
-
-        $this->actingAs($user)->get("/email/verify/{$user->id}/".sha1($user->email))->assertForbidden();
-        $this->assertFalse($user->fresh()->hasVerifiedEmail());
     }
 }

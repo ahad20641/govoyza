@@ -18,7 +18,7 @@ class LoginTest extends TestCase
             [User::factory()->create(), '/client'],
             [User::factory()->agency()->create(), '/agency'],
             [User::factory()->vendor()->create(), '/vendor'],
-            [User::factory()->superAdmin()->create(), '/admin'],
+            [User::factory()->owner()->create(), '/admin'],
         ];
 
         foreach ($cases as [$user, $path]) {
