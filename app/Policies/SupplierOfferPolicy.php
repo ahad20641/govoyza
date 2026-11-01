@@ -13,12 +13,12 @@ class SupplierOfferPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $this->hasActivePartner($user);
+        return $this->hasActivePartner($user) || $user->hasPermission('catalog.manage');
     }
 
     public function view(User $user, SupplierOffer $offer): bool
     {
-        return $this->owns($user, $offer);
+        return $this->owns($user, $offer) || $user->hasPermission('catalog.manage');
     }
 
     public function create(User $user): bool
@@ -32,7 +32,7 @@ class SupplierOfferPolicy
             return false;
         }
 
-        if (in_array($offer->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::Rejected], true)) {
+        if (in_array($offer->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::ChangesRequested], true)) {
             return true;
         }
 
@@ -43,6 +43,16 @@ class SupplierOfferPolicy
     public function delete(User $user, SupplierOffer $offer): bool
     {
         return false;
+    }
+
+    public function reviewAny(User $user): bool
+    {
+        return $user->hasPermission('catalog.manage');
+    }
+
+    public function review(User $user, SupplierOffer $offer): bool
+    {
+        return $user->hasPermission('catalog.manage');
     }
 
     private function owns(User $user, SupplierOffer $offer): bool

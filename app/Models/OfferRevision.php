@@ -31,4 +31,12 @@ class OfferRevision extends Model
     {
         return $this->belongsTo(User::class, 'reviewer_id');
     }
+
+    public function isCostIncrease(): bool
+    {
+        $newCost = $this->payload['cost_minor'] ?? null;
+        $oldCost = $this->payload['previous_cost_minor'] ?? $this->supplierOffer?->cost_minor;
+
+        return $newCost !== null && $oldCost !== null && (int) $newCost > (int) $oldCost;
+    }
 }

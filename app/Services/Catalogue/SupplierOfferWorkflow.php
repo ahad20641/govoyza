@@ -41,8 +41,8 @@ class SupplierOfferWorkflow
         return DB::transaction(function () use ($partner, $offer): SupplierOffer {
             $locked = $partner->supplierOffers()->whereKey($offer->getKey())->lockForUpdate()->firstOrFail();
 
-            if (! in_array($locked->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::Rejected], true)) {
-                throw new DomainException('Only draft or rejected offers can be submitted for review.');
+            if (! in_array($locked->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::ChangesRequested], true)) {
+                throw new DomainException('Only draft offers or offers with requested changes can be submitted for review.');
             }
 
             $locked->status = SupplierOfferStatus::Pending;
@@ -61,7 +61,7 @@ class SupplierOfferWorkflow
             $locked = $partner->supplierOffers()->whereKey($offer->getKey())->lockForUpdate()->firstOrFail();
             $changes = Arr::only($attributes, self::REVISION_FIELDS);
 
-            if (in_array($locked->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::Rejected], true)) {
+            if (in_array($locked->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::ChangesRequested], true)) {
                 $locked->fill($changes);
                 $locked->save();
 
@@ -77,7 +77,7 @@ class SupplierOfferWorkflow
             }
 
             return $locked->revisions()->create([
-                'payload' => $changes,
+                'payload' => [...$changes, 'previous_cost_minor' => $locked->cost_minor],
                 'status' => OfferRevisionStatus::Pending,
                 'submitted_at' => now(),
             ]);

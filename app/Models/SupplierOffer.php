@@ -15,7 +15,7 @@ class SupplierOffer extends Model
 
     protected $fillable = [
         'product_id', 'cost_minor', 'currency', 'processing_days', 'capacity_per_week',
-        'priority', 'status', 'inclusions', 'refund_terms',
+        'priority', 'status', 'inclusions', 'refund_terms', 'reviewer_id', 'reviewed_at', 'review_comment',
     ];
 
     protected function casts(): array
@@ -25,6 +25,7 @@ class SupplierOffer extends Model
             'priority' => OfferPriority::class,
             'status' => SupplierOfferStatus::class,
             'inclusions' => 'array',
+            'reviewed_at' => 'datetime',
         ];
     }
 
@@ -41,5 +42,10 @@ class SupplierOffer extends Model
     public function revisions(): HasMany
     {
         return $this->hasMany(OfferRevision::class);
+    }
+
+    public function reviewer(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reviewer_id');
     }
 }
