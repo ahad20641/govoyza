@@ -151,6 +151,24 @@ New staff account: same first two lines, then
 Staff passwords need 12+ characters with upper and lower case, a number and a symbol.
 `reset-password` signs the account out of every session.
 
+## Staging password
+All of staging (every host and path except `/up`) sits behind HTTP Basic Auth (`App\Http\Middleware\StagingGate`)
+while `GOVOYZA_STAGING_PASSWORD_HASH` is set in staging's `.env`. Only a bcrypt hash is stored. 20 wrong guesses
+per minute per IP lock that IP out for a minute. Set or change the password (username defaults to `govoyza`):
+```bash
+cd ~/domains/govoyza.com/staging-app
+read -rs -p 'Staging password: ' P1; echo; read -rs -p 'Again: ' P2; echo
+printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:staging-password --password-stdin; unset P1 P2
+```
+The command refreshes the config cache itself and refuses to run when `APP_ENV=production`. To turn the gate
+off, delete the `GOVOYZA_STAGING_PASSWORD_HASH` line and run `php artisan config:cache`.
+
+## Coming-soon page (production, until the first deploy)
+`deploy/coming-soon/` (`index.html` + `.htaccess`) is copied into `~/domains/govoyza.com/public_html`. The
+`.htaccess` adds `noindex` for the partner./admin. hosts, which share that web root. Hostinger's placeholder is
+kept in `~/domains/govoyza.com/public_html_placeholder_backup/`. At production's first real deploy,
+`public_html` becomes the symlink to `app/public` (see "One-time setup"), which replaces this page.
+
 ## Test email
 After setting `MAIL_PASSWORD` and running `config:cache`: `php artisan govoyza:send-test-email you@example.com`.
 

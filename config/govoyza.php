@@ -39,4 +39,20 @@ return [
 
     'currency' => env('GOVOYZA_CURRENCY', 'BDT'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Staging gate
+    |--------------------------------------------------------------------------
+    |
+    | HTTP Basic Auth in front of the whole app (except /up) while a password
+    | hash is set. Only staging sets it, with `php artisan govoyza:staging-password`.
+    | Never set it in production.
+    |
+    */
+
+    'staging_gate' => [
+        'user' => env('GOVOYZA_STAGING_USER', 'govoyza'),
+        'password_hash' => env('GOVOYZA_STAGING_PASSWORD_HASH'),
+    ],
+
 ];
