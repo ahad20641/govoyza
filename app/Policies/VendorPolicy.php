@@ -10,26 +10,26 @@ class VendorPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermission('vendors.manage');
+        return $user->hasPermission('partners.manage');
     }
 
     public function view(User $user, Vendor $vendor): bool
     {
-        return $vendor->user_id === $user->id || $user->hasPermission('vendors.manage');
+        return $vendor->user_id === $user->id || $user->hasPermission('partners.manage');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermission('vendors.manage');
+        return $user->hasPermission('partners.manage');
     }
 
     public function update(User $user, Vendor $vendor): bool
     {
-        return $user->hasPermission('vendors.manage');
+        return $user->hasPermission('partners.manage');
     }
 
     public function delete(User $user, Vendor $vendor): bool
     {
-        return $user->hasPermission('vendors.manage');
+        return $user->hasPermission('partners.manage');
     }
 }

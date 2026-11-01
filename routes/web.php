@@ -54,16 +54,9 @@ Route::domain(config('govoyza.domains.main'))->group(function () {
             Route::prefix('agency')->name('agency.')->middleware('type:agent_user')->group(function () {
                 Route::get('/', [DashboardController::class, 'agency'])->name('dashboard');
             });
-
-            Route::prefix('vendor')->name('vendor.')->middleware('type:partner_user')->group(function () {
-                Route::get('/', [DashboardController::class, 'vendor'])->name('dashboard');
-            });
         });
     });
 });
 
-Route::domain(config('govoyza.domains.partner'))->group(function () {
-    Route::view('/', 'home')->name('partner.home');
-});
-
-// The admin domain is the Filament panel: App\Providers\Filament\AdminPanelProvider.
+// The partner and admin domains are Filament panels (App\Providers\Filament\*PanelProvider).
+// Don't add routes for those hosts here: a same-host route silently replaces the panel's.

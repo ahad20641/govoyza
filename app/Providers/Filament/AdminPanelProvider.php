@@ -24,7 +24,7 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 /**
  * Admin console on its own domain (admin.govoyza.com). Staff only (User::canAccessPanel),
  * 2FA required for everyone, optional IP allowlist. Every write here is audited
- * (App\Services\Audit\AdminWriteRecorder). What each staff role sees comes from
+ * (App\Services\Audit\PanelWriteRecorder). What each staff role sees comes from
  * the Policies and config/permissions.php.
  */
 class AdminPanelProvider extends PanelProvider

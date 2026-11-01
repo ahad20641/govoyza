@@ -59,6 +59,25 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Partner portal
+    |--------------------------------------------------------------------------
+    |
+    | path: URL prefix on the partner domain. Production: '' (partner.govoyza.com/).
+    | Staging sets GOVOYZA_PARTNER_DOMAIN=staging.govoyza.com and GOVOYZA_PARTNER_PATH=partner.
+    |
+    | agreement_version: raise it whenever resources/agreements/partner-agreement.md
+    | changes; partners on an older version are asked to sign again.
+    |
+    */
+
+    'partner' => [
+        'path' => trim((string) env('GOVOYZA_PARTNER_PATH', ''), '/'),
+        'agreement_version' => '2026-11-01-draft',
+        'invitation_days' => 7,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Staging gate
     |--------------------------------------------------------------------------
     |

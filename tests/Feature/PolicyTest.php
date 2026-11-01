@@ -73,7 +73,7 @@ class PolicyTest extends TestCase
 
     public function test_vendors_are_hidden_from_everyone_but_operations_and_themselves(): void
     {
-        $vendorUser = User::factory()->vendor()->create();
+        $vendorUser = User::factory()->partner()->create();
         $vendor = Vendor::forceCreate(['user_id' => $vendorUser->id, 'name' => 'Secret Supplier', 'code' => 'V1']);
 
         $this->assertTrue(Gate::forUser($vendorUser)->allows('view', $vendor));

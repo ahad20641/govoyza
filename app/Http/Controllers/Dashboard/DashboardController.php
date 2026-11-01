@@ -9,8 +9,8 @@ use Illuminate\View\View;
 
 /**
  * Phase 1: role-gated dashboard shells. Each portal is filled in by its
- * own task (customer 1.22, partner 1.7, agency Phase 2). Staff use the
- * Filament admin console on the admin domain instead.
+ * own task (customer 1.22, agency Phase 2). Staff and partners use their
+ * Filament panels on the admin and partner domains instead.
  */
 class DashboardController extends Controller
 {
@@ -27,11 +27,6 @@ class DashboardController extends Controller
     public function agency(): View
     {
         return view('dashboards.shell', ['portal' => 'Agency', 'title' => 'Agency Dashboard']);
-    }
-
-    public function vendor(): View
-    {
-        return view('dashboards.shell', ['portal' => 'Vendor', 'title' => 'Vendor Dashboard']);
     }
 
     public function pending(Request $request): View

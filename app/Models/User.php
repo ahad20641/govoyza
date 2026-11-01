@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\OtpPurpose;
+use App\Enums\PartnerStatus;
 use App\Enums\RoleSlug;
 use App\Enums\UserStatus;
 use App\Enums\UserType;
@@ -105,9 +106,15 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return $this->hasOne(Agency::class);
     }
 
+    /** Legacy inherited table; replaced by partner() and removed with the old vendor_* tables. */
     public function vendor(): HasOne
     {
         return $this->hasOne(Vendor::class);
+    }
+
+    public function partner(): BelongsTo
+    {
+        return $this->belongsTo(Partner::class);
     }
 
     public function oneTimePasswords(): HasMany
@@ -164,13 +171,24 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return $this->type?->dashboardRoute() ?? 'home';
     }
 
-    /** Admin console: active staff with admin.access. The partner panel (1.7) gets its own rule. */
+    /**
+     * Admin console: active staff with admin.access.
+     * Partner portal: active partner users whose partner isn't suspended
+     * (pending partners get in to finish onboarding).
+     */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $panel->getId() === 'admin'
-            && $this->isStaff()
-            && $this->status === UserStatus::Active
-            && ($this->isOwner() || $this->hasPermission('admin.access'));
+        if ($this->status !== UserStatus::Active) {
+            return false;
+        }
+
+        return match ($panel->getId()) {
+            'admin' => $this->isStaff() && ($this->isOwner() || $this->hasPermission('admin.access')),
+            'partner' => $this->type === UserType::PartnerUser
+                && $this->partner !== null
+                && $this->partner->status !== PartnerStatus::Suspended,
+            default => false,
+        };
     }
 
     // Filament app (TOTP) 2FA, stored in the encrypted two_factor_* columns.

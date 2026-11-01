@@ -171,6 +171,14 @@ off, delete the `GOVOYZA_STAGING_PASSWORD_HASH` line and run `php artisan config
 - Optional IP allowlist: `GOVOYZA_ADMIN_IPS=1.2.3.4,10.0.0.0/8`, then `php artisan config:cache`.
 - Filament's CSS/JS are published on each deploy by `post-deploy.sh` (`filament:assets`).
 
+## Partner portal (Filament)
+- Production: `https://partner.govoyza.com/`. Staging: `GOVOYZA_PARTNER_DOMAIN=staging.govoyza.com` and
+  `GOVOYZA_PARTNER_PATH=partner` → `https://staging.govoyza.com/partner`.
+- Partners join only through an invite: admin console → Partners → "Invite partner". The emailed link works once
+  and expires after 7 days. Never link the portal from the public site.
+- Before any real partner signs: replace `resources/agreements/partner-agreement.md` with the lawyer-approved
+  supplier agreement and raise `agreement_version` in `config/govoyza.php`.
+
 ## Coming-soon page (production, until the first deploy)
 `deploy/coming-soon/` (`index.html` + `.htaccess`) is copied into `~/domains/govoyza.com/public_html`. The
 `.htaccess` adds `noindex` for the partner./admin. hosts, which share that web root. Hostinger's placeholder is
