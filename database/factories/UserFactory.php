@@ -58,9 +58,9 @@ class UserFactory extends Factory
         return $this->role(RoleSlug::Agency);
     }
 
-    public function vendor(): static
+    public function partner(): static
     {
-        return $this->role(RoleSlug::Vendor);
+        return $this->role(RoleSlug::Partner);
     }
 
     public function status(UserStatus $status): static

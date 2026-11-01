@@ -22,9 +22,9 @@ return [
     // group => [slug => [label, [roles]]]
     'applications' => [
         'applications.create' => ['Create visa applications', ['client', 'agency']],
-        'applications.view_own' => ['View own / assigned applications', ['client', 'agency', 'vendor']],
+        'applications.view_own' => ['View own / assigned applications', ['client', 'agency', 'partner']],
         'applications.view_any' => ['View all applications', ['operations', 'finance']],
-        'applications.update_status' => ['Change application status', ['agency', 'vendor', 'operations']],
+        'applications.update_status' => ['Change application status', ['agency', 'partner', 'operations']],
         'applications.verify_documents' => ['Verify application documents', ['operations']],
         'applications.refund' => ['Issue refunds', ['finance']],
     ],
@@ -37,7 +37,7 @@ return [
         'b2b.view_reports' => ['View own reports', ['agency']],
     ],
     'chat' => [
-        'chat.use' => ['Use secure chat', ['client', 'agency', 'vendor']],
+        'chat.use' => ['Use secure chat', ['client', 'agency', 'partner']],
         'chat.audit' => ['Audit conversations', ['operations']],
     ],
     'admin' => [
@@ -45,7 +45,7 @@ return [
         'staff.manage' => ['Manage staff accounts and roles', []],
         'clients.manage' => ['Manage clients', ['operations']],
         'agencies.manage' => ['Approve / suspend / manage agencies', ['operations']],
-        'vendors.manage' => ['Manage vendors', ['operations']],
+        'partners.manage' => ['Invite, approve and manage partners (suppliers)', ['operations']],
         'catalog.manage' => ['Manage countries, visa categories, types and rules', ['operations']],
         'pricing.manage' => ['Manage services & pricing', []],
         'exchange_rates.manage' => ['Set exchange rates and buffers', ['finance']],

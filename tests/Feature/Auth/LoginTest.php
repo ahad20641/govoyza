@@ -17,7 +17,6 @@ class LoginTest extends TestCase
         $cases = [
             [User::factory()->create(), '/client'],
             [User::factory()->agency()->create(), '/agency'],
-            [User::factory()->vendor()->create(), '/vendor'],
         ];
 
         foreach ($cases as [$user, $path]) {
@@ -28,18 +27,22 @@ class LoginTest extends TestCase
         }
 
         $this->assertNotNull(User::first()->last_login_at);
-        $this->assertSame(3, AuditLog::where('action', 'auth.login')->count());
+        $this->assertSame(2, AuditLog::where('action', 'auth.login')->count());
     }
 
-    public function test_staff_are_sent_to_the_admin_console_to_sign_in(): void
+    public function test_staff_and_partners_are_sent_to_their_panel_to_sign_in(): void
     {
-        $owner = User::factory()->owner()->create();
+        $cases = [
+            [User::factory()->owner()->create(), 'filament.admin.auth.login'],
+            [User::factory()->partner()->create(), 'filament.partner.auth.login'],
+        ];
 
-        $this->post('/login', ['email' => $owner->email, 'password' => 'password'])
-            ->assertRedirect(route('filament.admin.auth.login'));
+        foreach ($cases as [$user, $login]) {
+            $this->post('/login', ['email' => $user->email, 'password' => 'password'])->assertRedirect(route($login));
 
-        // Not signed in on the public site: the admin console has its own session and 2FA.
-        $this->assertGuest();
+            // Not signed in on the public site: each panel has its own session and requires 2FA.
+            $this->assertGuest();
+        }
     }
 
     public function test_wrong_password_fails_and_is_audited(): void

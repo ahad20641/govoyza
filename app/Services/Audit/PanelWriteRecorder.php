@@ -8,15 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * Writes an audit record for every Eloquent create/update/delete made inside
- * the admin panel (security.md: "audit log for every admin write"). Hooked to
+ * the admin or partner panel (security.md: "audit log for every admin and
+ * partner write"), as `admin.created`, `partner.updated` and so on. Hooked to
  * the wildcard Eloquent events in AppServiceProvider.
  *
- * "Inside the admin panel" = Filament's current panel is `admin`. Filament's
- * SetUpPanel middleware is persistent, so this also holds for Livewire update
- * requests, which is where the saves actually happen.
+ * "Inside a panel" = Filament's current panel. Filament's SetUpPanel middleware
+ * is persistent, so this also holds for Livewire update requests, which is where
+ * the saves actually happen.
  */
-class AdminWriteRecorder
+class PanelWriteRecorder
 {
+    private const PANELS = ['admin', 'partner'];
+
     /** Models never recorded: the audit table itself (no recursion). */
     private const IGNORED = [AuditLog::class];
 
@@ -24,19 +27,21 @@ class AdminWriteRecorder
 
     public function record(string $event, Model $model): void
     {
-        if (Filament::getCurrentPanel()?->getId() !== 'admin' || in_array($model::class, self::IGNORED, true)) {
+        $panel = Filament::getCurrentPanel()?->getId();
+
+        if (! in_array($panel, self::PANELS, true) || in_array($model::class, self::IGNORED, true)) {
             return;
         }
 
         match ($event) {
-            'created' => $this->audit->log('admin.created', $model, new: $this->visible($model, $model->getAttributes())),
+            'created' => $this->audit->log("{$panel}.created", $model, new: $this->visible($model, $model->getAttributes())),
             'updated' => $this->audit->log(
-                'admin.updated',
+                "{$panel}.updated",
                 $model,
                 old: $this->visible($model, array_intersect_key($model->getOriginal(), $this->changes($model))),
                 new: $this->visible($model, $this->changes($model)),
             ),
-            'deleted' => $this->audit->log('admin.deleted', $model, old: $this->visible($model, $model->getOriginal())),
+            'deleted' => $this->audit->log("{$panel}.deleted", $model, old: $this->visible($model, $model->getOriginal())),
         };
     }
 

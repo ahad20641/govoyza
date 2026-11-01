@@ -11,7 +11,7 @@ class UserPolicy
     private const PERMISSIONS = [
         'customer' => 'clients.manage',
         'agent_user' => 'agencies.manage',
-        'partner_user' => 'vendors.manage',
+        'partner_user' => 'partners.manage',
         'admin' => 'staff.manage',
     ];
 

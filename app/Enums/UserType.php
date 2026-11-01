@@ -29,7 +29,7 @@ enum UserType: string
         return match ($this) {
             self::Customer => 'client.dashboard',
             self::AgentUser => 'agency.dashboard',
-            self::PartnerUser => 'vendor.dashboard',
+            self::PartnerUser => 'filament.partner.pages.dashboard', // partner.govoyza.com (Filament)
             self::Admin => 'filament.admin.pages.dashboard', // admin.govoyza.com (Filament)
         };
     }

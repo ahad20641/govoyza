@@ -7,8 +7,8 @@ use App\Models\District;
 use App\Models\Nationality;
 use App\Models\User;
 use App\Policies\ReferenceDataPolicy;
-use App\Services\Audit\AdminWriteRecorder;
 use App\Services\Audit\AuditLogger;
+use App\Services\Audit\PanelWriteRecorder;
 use Filament\Facades\Filament;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Login;
@@ -35,22 +35,22 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Every create/update/delete made in the admin console is audited.
+        // Every create/update/delete made in the admin console or partner portal is audited.
         foreach (['created', 'updated', 'deleted'] as $event) {
             Event::listen("eloquent.{$event}: *", function (string $name, array $payload) use ($event) {
-                app(AdminWriteRecorder::class)->record($event, $payload[0]);
+                app(PanelWriteRecorder::class)->record($event, $payload[0]);
             });
         }
 
-        // Admin console sign-ins (Filament's own login page) are audited like the site's.
+        // Panel sign-ins (Filament's own login pages) are audited like the site's: admin.login, partner.login_failed…
         Event::listen(Login::class, function (Login $e) {
-            if (Filament::getCurrentPanel()?->getId() === 'admin') {
-                app(AuditLogger::class)->log('admin.login', $e->user, userId: $e->user->getAuthIdentifier());
+            if ($panel = Filament::getCurrentPanel()?->getId()) {
+                app(AuditLogger::class)->log("{$panel}.login", $e->user, userId: $e->user->getAuthIdentifier());
             }
         });
         Event::listen(Failed::class, function (Failed $e) {
-            if (Filament::getCurrentPanel()?->getId() === 'admin') {
-                app(AuditLogger::class)->log('admin.login_failed', meta: ['email' => strtolower((string) ($e->credentials['email'] ?? ''))]);
+            if ($panel = Filament::getCurrentPanel()?->getId()) {
+                app(AuditLogger::class)->log("{$panel}.login_failed", meta: ['email' => strtolower((string) ($e->credentials['email'] ?? ''))]);
             }
         });
 

@@ -109,3 +109,28 @@
 - **Staging admin URL:** staging has no admin subdomain (subdomain roots are forced inside production's web root),
   so the panel path is configurable: `GOVOYZA_ADMIN_PATH=admin` + `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com` →
   `staging.govoyza.com/admin`. Production leaves the path empty. The partner panel (1.7) will use the same pattern.
+
+## 2026-11-01 — Partner portal (task 1.7)
+
+- New `partners` table per `planning/data-model.md`, plus `users.partner_id`, `partner_documents` (KYC on the private
+  disk, random names, sha256) and `partner_invitations` (sha256 of the link token only; 7-day expiry; single use).
+  The inherited `vendors` / `vendor_*` tables are **not** migrated. They stay until the catalogue (1.9),
+  application (1.17/1.20) and finance (1.24) tasks rebuild those tables on `partners`, then they get dropped.
+- Role `vendor` → **`partner`** (`RoleSlug::Partner`, by migration); permission `vendors.manage` →
+  **`partners.manage`** (Operations, Owner). The `/vendor` shell is gone; partner users signing in on the public site
+  are sent to the partner login.
+- Partner portal = second Filament panel `partner` on `GOVOYZA_PARTNER_DOMAIN` + `GOVOYZA_PARTNER_PATH`
+  (production `partner.govoyza.com/`; staging `staging.govoyza.com/partner`). 2FA required. Access: active partner
+  user whose partner isn't suspended; pending partners get in to finish onboarding.
+- Join by **invite link only** (admin "Invite partner" action). The link page is a guest route inside the panel.
+  The invited email counts as verified.
+- Onboarding pages: KYC documents (trade licence + owner ID required), bank details (encrypted array cast), agreement.
+  **Click-to-sign** stores typed name, time, IP, agreement version, signer and the sha256 of the exact text.
+  Raising `govoyza.partner.agreement_version` makes every partner sign again.
+- **The agreement text is a marked placeholder** (`resources/agreements/partner-agreement.md`). Claude doesn't write
+  legal terms; the lawyer-approved supplier agreement (Phase 0) replaces it before any real partner signs.
+- Admin: Partners resource (list + view; no create/edit/delete). Approve only when no onboarding gaps
+  (`Partner::onboardingGaps()`); Suspend (with reason) / Reactivate. KYC files download through a Livewire action,
+  policy-checked and audited, never via a public URL. Bank account shown masked to staff.
+- `AdminWriteRecorder` → `PanelWriteRecorder`: writes in the partner panel are audited as `partner.created/updated/deleted`
+  (security.md: "every admin and partner write"); panel logins as `{panel}.login` / `{panel}.login_failed`.

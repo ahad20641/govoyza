@@ -7,7 +7,7 @@ namespace App\Enums;
  * database; these slugs are the stable keys code relies on.
  *
  * Owner, Operations and Finance are Govoyza staff roles. Client, Agency and
- * Vendor are the single role of their account type.
+ * Partner are the single role of their account type.
  */
 enum RoleSlug: string
 {
@@ -16,7 +16,7 @@ enum RoleSlug: string
     case Finance = 'finance';
     case Client = 'client';
     case Agency = 'agency';
-    case Vendor = 'vendor';
+    case Partner = 'partner';
 
     public function label(): string
     {
@@ -26,7 +26,7 @@ enum RoleSlug: string
             self::Finance => 'Finance',
             self::Client => 'Client',
             self::Agency => 'Travel Agency',
-            self::Vendor => 'Vendor',
+            self::Partner => 'Partner',
         };
     }
 
@@ -37,7 +37,7 @@ enum RoleSlug: string
             self::Owner, self::Operations, self::Finance => UserType::Admin,
             self::Client => UserType::Customer,
             self::Agency => UserType::AgentUser,
-            self::Vendor => UserType::PartnerUser,
+            self::Partner => UserType::PartnerUser,
         };
     }
 

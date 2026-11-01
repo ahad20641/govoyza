@@ -19,7 +19,7 @@ class UserTypesAndRolesTest extends TestCase
         $this->assertSame(UserType::Admin, RoleSlug::Finance->userType());
         $this->assertSame(UserType::Customer, RoleSlug::Client->userType());
         $this->assertSame(UserType::AgentUser, RoleSlug::Agency->userType());
-        $this->assertSame(UserType::PartnerUser, RoleSlug::Vendor->userType());
+        $this->assertSame(UserType::PartnerUser, RoleSlug::Partner->userType());
     }
 
     public function test_type_is_derived_from_role_when_missing(): void
@@ -77,7 +77,7 @@ class UserTypesAndRolesTest extends TestCase
         // Operations runs orders but never touches money.
         $this->assertTrue(Gate::forUser($operations)->allows('applications.update_status'));
         $this->assertTrue(Gate::forUser($operations)->allows('applications.verify_documents'));
-        $this->assertTrue(Gate::forUser($operations)->allows('vendors.manage'));
+        $this->assertTrue(Gate::forUser($operations)->allows('partners.manage'));
         foreach (['applications.refund', 'payments.manage', 'ledger.manage', 'exchange_rates.manage', 'reports.view_all'] as $money) {
             $this->assertFalse(Gate::forUser($operations)->allows($money), $money);
         }

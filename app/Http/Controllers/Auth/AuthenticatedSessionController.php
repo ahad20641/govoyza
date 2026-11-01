@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserType;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Services\Audit\AuditLogger;
@@ -21,13 +22,19 @@ class AuthenticatedSessionController extends Controller
     {
         $user = $request->authenticate($audit);
 
-        // Staff sign in on the admin console, which has its own session and requires 2FA.
-        if ($user->isStaff()) {
+        // Staff and partners sign in on their own panels, which have their own session and require 2FA.
+        $panelLogin = match ($user->type) {
+            UserType::Admin => 'filament.admin.auth.login',
+            UserType::PartnerUser => 'filament.partner.auth.login',
+            default => null,
+        };
+
+        if ($panelLogin) {
             Auth::guard('web')->logout();
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            return redirect()->away(route('filament.admin.auth.login'));
+            return redirect()->away(route($panelLogin));
         }
 
         // Prevent session fixation.

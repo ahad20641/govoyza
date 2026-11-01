@@ -11,16 +11,16 @@ class DomainRoutingTest extends TestCase
         $this->get('http://'.config('govoyza.domains.main').'/')
             ->assertOk();
 
-        $this->get('http://'.config('govoyza.domains.partner').'/')
-            ->assertOk()
-            ->assertHeader('X-Robots-Tag', 'noindex');
+        // The partner and admin domains are Filament panels: guests go to their login pages.
+        foreach (['partner', 'admin'] as $panel) {
+            $host = 'http://'.config("govoyza.domains.{$panel}");
 
-        // The admin domain is the Filament panel: guests go to its login page.
-        $this->get('http://'.config('govoyza.domains.admin').'/')
-            ->assertRedirect(route('filament.admin.auth.login'))
-            ->assertHeader('X-Robots-Tag', 'noindex');
-        $this->get('http://'.config('govoyza.domains.admin').'/login')
-            ->assertOk()
-            ->assertHeader('X-Robots-Tag', 'noindex');
+            $this->get($host.'/')
+                ->assertRedirect(route("filament.{$panel}.auth.login"))
+                ->assertHeader('X-Robots-Tag', 'noindex');
+            $this->get($host.'/login')
+                ->assertOk()
+                ->assertHeader('X-Robots-Tag', 'noindex');
+        }
     }
 }

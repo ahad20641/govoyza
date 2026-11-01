@@ -59,7 +59,7 @@ class AdminConsoleTest extends TestCase
 
     public function test_non_staff_and_inactive_staff_are_refused(): void
     {
-        foreach ([User::factory()->create(), User::factory()->agency()->create(), User::factory()->vendor()->create()] as $user) {
+        foreach ([User::factory()->create(), User::factory()->agency()->create(), User::factory()->partner()->create()] as $user) {
             $this->actingAs($user)->get($this->url())->assertForbidden();
         }
 
