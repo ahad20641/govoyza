@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Partners;
+namespace App\Domain\Partners;
 
 use Illuminate\Support\Str;
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SupplierOfferReviews\Pages;
 
+use App\Domain\Catalogue\OfferReviewWorkflow;
 use App\Enums\Currency;
 use App\Enums\MarkupType;
 use App\Enums\OfferPriority;
@@ -10,7 +11,6 @@ use App\Enums\SupplierOfferStatus;
 use App\Filament\Resources\SupplierOfferReviews\SupplierOfferReviewResource;
 use App\Models\OfferRevision;
 use App\Models\SupplierOffer;
-use App\Services\Catalogue\OfferReviewWorkflow;
 use App\Support\Money\Money;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;

@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Partner;
 
+use App\Domain\Partners\PartnerInvitations;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use App\Services\Partners\PartnerInvitations;
 use Filament\Facades\Filament;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

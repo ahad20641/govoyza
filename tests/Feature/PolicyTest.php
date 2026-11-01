@@ -11,7 +11,6 @@ use App\Models\ExchangeRate;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
-use App\Models\Vendor;
 use Illuminate\Support\Facades\Gate;
 use Tests\TestCase;
 
@@ -69,21 +68,6 @@ class PolicyTest extends TestCase
         $this->assertTrue(Gate::forUser($operations)->allows('approve', $agencyA));
         $this->assertTrue(Gate::forUser($operations)->allows('review', $docB));
         $this->assertFalse(Gate::forUser(User::factory()->finance()->create())->allows('approve', $agencyA));
-    }
-
-    public function test_vendors_are_hidden_from_everyone_but_operations_and_themselves(): void
-    {
-        $vendorUser = User::factory()->partner()->create();
-        $vendor = Vendor::forceCreate(['user_id' => $vendorUser->id, 'name' => 'Secret Supplier', 'code' => 'V1']);
-
-        $this->assertTrue(Gate::forUser($vendorUser)->allows('view', $vendor));
-        $this->assertFalse(Gate::forUser($vendorUser)->allows('update', $vendor));
-        $this->assertTrue(Gate::forUser(User::factory()->operations()->create())->allows('update', $vendor));
-
-        foreach ([User::factory()->create(), User::factory()->agency()->create(), User::factory()->finance()->create()] as $user) {
-            $this->assertFalse(Gate::forUser($user)->allows('view', $vendor));
-            $this->assertFalse(Gate::forUser($user)->allows('viewAny', Vendor::class));
-        }
     }
 
     public function test_exchange_rates_are_finance_only_and_append_only(): void

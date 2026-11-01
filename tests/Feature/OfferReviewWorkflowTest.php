@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalogue\OfferReviewWorkflow;
+use App\Domain\Catalogue\SupplierOfferWorkflow;
 use App\Enums\Currency;
 use App\Enums\MarkupType;
 use App\Enums\OfferPriority;
@@ -15,8 +17,6 @@ use App\Models\Partner;
 use App\Models\Product;
 use App\Models\User;
 use App\Models\VisaType;
-use App\Services\Catalogue\OfferReviewWorkflow;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use DomainException;
 use Tests\TestCase;
 

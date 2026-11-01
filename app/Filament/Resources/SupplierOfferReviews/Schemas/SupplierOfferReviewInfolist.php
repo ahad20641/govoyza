@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\SupplierOfferReviews\Schemas;
 
+use App\Domain\Catalogue\OfferReviewWorkflow;
 use App\Enums\OfferRevisionStatus;
 use App\Models\OfferRevision;
 use App\Models\SupplierOffer;
-use App\Services\Catalogue\OfferReviewWorkflow;
 use App\Support\Money\Money;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;

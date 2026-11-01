@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Partners;
+namespace App\Domain\Partners;
 
 use App\Enums\KycStatus;
 use App\Enums\PartnerStatus;

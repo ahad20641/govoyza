@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Domain\Partners\PartnerAgreement;
 use App\Enums\KycStatus;
 use App\Enums\PartnerDocumentType;
 use App\Enums\PartnerStatus;
-use App\Services\Partners\PartnerAgreement;
+use Database\Factories\PartnerFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -20,7 +22,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Partner extends Model
 {
-    use SoftDeletes;
+    /** @use HasFactory<PartnerFactory> */
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['legal_name', 'contact_phone'];
 
@@ -50,6 +53,16 @@ class Partner extends Model
     public function supplierOffers(): HasMany
     {
         return $this->hasMany(SupplierOffer::class);
+    }
+
+    public function serviceJobs(): HasMany
+    {
+        return $this->hasMany(ServiceJob::class);
+    }
+
+    public function payouts(): HasMany
+    {
+        return $this->hasMany(Payout::class);
     }
 
     public function approver(): BelongsTo

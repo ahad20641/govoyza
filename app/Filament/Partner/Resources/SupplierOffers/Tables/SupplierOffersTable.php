@@ -2,11 +2,11 @@
 
 namespace App\Filament\Partner\Resources\SupplierOffers\Tables;
 
+use App\Domain\Catalogue\SupplierOfferWorkflow;
 use App\Enums\OfferRevisionStatus;
 use App\Enums\SupplierOfferStatus;
 use App\Filament\Partner\Resources\SupplierOffers\SupplierOfferResource;
 use App\Models\SupplierOffer;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;

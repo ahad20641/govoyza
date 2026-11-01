@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalogue\SupplierOfferWorkflow;
 use App\Enums\Currency;
 use App\Enums\MarkupType;
 use App\Enums\OfferPriority;
@@ -18,7 +19,6 @@ use App\Models\Product;
 use App\Models\SupplierOffer;
 use App\Models\User;
 use App\Models\VisaType;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Facades\Filament;
 use Livewire\Livewire;

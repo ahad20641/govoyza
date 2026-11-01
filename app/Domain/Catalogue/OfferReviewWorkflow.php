@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Catalogue;
+namespace App\Domain\Catalogue;
 
 use App\Enums\OfferPriority;
 use App\Enums\OfferRevisionStatus;
