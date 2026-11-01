@@ -113,4 +113,5 @@ composer run dev            # local server + queue + vite
 php artisan test            # tests
 ./vendor/bin/pint           # code style
 php artisan migrate:fresh --seed   # LOCAL ONLY
+php artisan db:seed --class=DemoSeeder   # sample data (local/staging only; runs on every staging deploy)
 ```
