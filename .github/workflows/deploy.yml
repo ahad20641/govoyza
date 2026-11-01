@@ -108,6 +108,7 @@ jobs:
             --exclude='.git' --exclude='.github' --exclude='.env' --exclude='storage/' \
             --exclude='node_modules' --exclude='tests' --exclude='vendor' \
             --exclude='memory' --exclude='planning' --exclude='.claude' \
+            --exclude='/public/storage' \
             -e "ssh -p ${{ secrets.HOSTINGER_SSH_PORT }} -i ~/.ssh/deploy_key" \
             ./ "${{ secrets.HOSTINGER_SSH_USER }}@${{ secrets.HOSTINGER_SSH_HOST }}:${{ steps.target.outputs.path }}/"
       - if: steps.guard.outputs.app == 'yes'
