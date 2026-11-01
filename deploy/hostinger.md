@@ -137,17 +137,17 @@ cd ~/domains/govoyza.com/staging-app && php artisan config:cache
 
 ## Staff passwords (create-admin, reset-password)
 Hostinger disables `shell_exec()`, so PHP can't hide what you type, and a normal prompt would show the
-password on screen. `govoyza:create-admin` and `govoyza:reset-password` refuse to prompt there. Instead,
-the shell's `read -s` hides the input and passes it in with `--password-stdin` (two lines: the password and
-its confirmation). Nothing ends up in shell history or on screen.
+password on screen. `govoyza:create-admin` and `govoyza:reset-password` refuse to prompt there. Use
+`deploy/password.sh` instead: it asks twice with the shell's `read -s` (reading straight from the terminal) and
+passes the password in with `--password-stdin`. Nothing ends up in shell history or on screen.
 
+Run **one line at a time**; each asks for the password itself, so there is nothing to paste after it:
 ```bash
 cd ~/domains/govoyza.com/staging-app        # production: ~/domains/govoyza.com/app
-read -rs -p 'New password: ' P1; echo; read -rs -p 'Again: ' P2; echo
-printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:reset-password you@example.com --password-stdin; unset P1 P2
+bash deploy/password.sh reset-password you@example.com
+bash deploy/password.sh create-admin --name="Your Name" --email=you@example.com --role=owner
 ```
-New staff account: same first two lines, then
-`printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:create-admin --name="Name" --email=you@example.com --role=owner --password-stdin; unset P1 P2`.
+Don't paste a block of `read …` lines: the first `read` takes the next pasted line as the password.
 Staff passwords need 12+ characters with upper and lower case, a number and a symbol.
 `reset-password` signs the account out of every session.
 
@@ -157,8 +157,7 @@ while `GOVOYZA_STAGING_PASSWORD_HASH` is set in staging's `.env`. Only a bcrypt 
 per minute per IP lock that IP out for a minute. Set or change the password (username defaults to `govoyza`):
 ```bash
 cd ~/domains/govoyza.com/staging-app
-read -rs -p 'Staging password: ' P1; echo; read -rs -p 'Again: ' P2; echo
-printf '%s\n%s\n' "$P1" "$P2" | php artisan govoyza:staging-password --password-stdin; unset P1 P2
+bash deploy/password.sh staging-password
 ```
 The command refreshes the config cache itself and refuses to run when `APP_ENV=production`. To turn the gate
 off, delete the `GOVOYZA_STAGING_PASSWORD_HASH` line and run `php artisan config:cache`.
