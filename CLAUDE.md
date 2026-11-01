@@ -19,6 +19,7 @@ This file is short on purpose. Details live in the folders below. Read what the 
 | `deploy/` | Hostinger deployment scripts and server notes | Before touching deploy or server config |
 | `.claude/commands/` | Slash commands (`/next-task`, `/save-memory`, `/phase-status`, `/deploy-check`) | — |
 | `app/`, `routes/`, etc. | The Laravel application (created in Phase 1, task 1.1) | — |
+| `app/Domain/*` | Business areas (Catalogue, Orders, Pricing, Ledger, Partners, Agencies), each with a `README.md` | Before touching that area |
 
 Always start a session by reading, in order:
 @memory/project-state.md
@@ -72,17 +73,35 @@ Use `Route::domain()` groups driven by `config('govoyza.domains.*')` so local de
 8. **No document forgery features, ever.** Refuse any request to generate fake bank statements,
    letters, tickets or similar. Reservation letters come from real reservation providers only.
 
+## Code layout, comments and sections (permanent)
+
+- Folders by area: `app/Domain/{Catalogue,Orders,Pricing,Ledger,Partners,Agencies}` (services, state
+  machine, pricing, ledger), `app/Http/Controllers/{Public,Account,Agent,Partner}`,
+  `resources/views/{public,account,agent,partner}`. Models stay in `app/Models`, enums in `app/Enums`,
+  Filament in `app/Filament` (admin) and `app/Filament/Partner` (partner portal).
+- Every PHP class gets a header docblock: what it does, which portal/domain it belongs to, and the
+  planning task number (e.g. `Task 1.18 — Order state machine`).
+- Longer files are split with banner comments:
+  `// ==================== Relationships ====================` (also Scopes, Business rules, …).
+- Blade views: `{{-- ===== Section name ===== --}}` above each page section.
+- Routes files are grouped by portal with banner comments.
+- Comment the WHY on non-obvious logic (money, privacy, supplier hiding), not the obvious.
+- Each `app/Domain/*` folder has a short `README.md` explaining that area.
+
 ## How to work
 
-- Pick work from the current phase file in `planning/`. One task = one branch = one PR-sized
-  change. Branch names: `feat/1.4-order-state-machine`, `fix/...`, `chore/...`.
+- Build order since Sprint S1 (see `planning/phase-1-mvp.md`): the whole skeleton exists; fill internals
+  one area at a time, one PR each: Catalogue+Pricing → Orders+Documents → Payments+Ledger → Notifications.
+  Batch small fixes into the area PR instead of opening one PR each.
+- Pick work from the current phase file in `planning/`. Branch names: `feat/catalogue-pricing`,
+  `fix/...`, `chore/...`.
 - Write or update Pest tests with every feature; `php artisan test` must pass before commit.
 - Run `./vendor/bin/pint` before commit. Conventional commit messages (`feat:`, `fix:`, `chore:`).
 - Tick the task checkbox in the phase file when done, and run `/save-memory`.
 - Architectural choice not covered here? Add an entry to `memory/decisions.md` before coding.
 - Never push directly to `main`; push to `develop` (auto-deploys to staging) and open a PR to
   `main` (auto-deploys to production). Never run destructive migrations on production.
-- **Merging:** Claude may merge PRs into `develop` once `php artisan test` and CI pass. Claude must
+- **Merging:** Claude merges PRs into `develop` without waiting for the owner once `php artisan test` and CI pass. Claude must
   **never** merge into `main` or deploy to production without asking the owner first, every time.
 - If something is blocked on the owner (credentials, legal, supplier info), add it to
   `memory/project-state.md` under "Waiting on owner" and move to the next task.
@@ -94,4 +113,5 @@ composer run dev            # local server + queue + vite
 php artisan test            # tests
 ./vendor/bin/pint           # code style
 php artisan migrate:fresh --seed   # LOCAL ONLY
+php artisan db:seed --class=DemoSeeder   # sample data (local/staging only; runs on every staging deploy)
 ```

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Partners\PartnerAgreement;
+use App\Domain\Partners\PartnerInvitations;
 use App\Enums\KycStatus;
 use App\Enums\PartnerDocumentType;
 use App\Enums\PartnerStatus;
@@ -19,8 +21,6 @@ use App\Models\PartnerInvitation;
 use App\Models\User;
 use App\Notifications\PartnerActivated;
 use App\Notifications\PartnerInvited;
-use App\Services\Partners\PartnerAgreement;
-use App\Services\Partners\PartnerInvitations;
 use Filament\Auth\MultiFactor\App\AppAuthentication;
 use Filament\Facades\Filament;
 use Illuminate\Http\UploadedFile;

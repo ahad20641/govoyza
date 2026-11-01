@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources\Partners\Pages;
 
+use App\Domain\Partners\PartnerApproval;
 use App\Enums\PartnerStatus;
 use App\Filament\Resources\Partners\PartnerResource;
 use App\Models\Partner;
 use App\Models\PartnerDocument;
 use App\Services\Audit\AuditLogger;
-use App\Services\Partners\PartnerApproval;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;

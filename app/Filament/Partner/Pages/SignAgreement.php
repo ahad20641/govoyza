@@ -2,9 +2,9 @@
 
 namespace App\Filament\Partner\Pages;
 
+use App\Domain\Partners\PartnerAgreement;
+use App\Domain\Partners\PartnerOnboarding;
 use App\Filament\Partner\Pages\Concerns\PartnerFormPage;
-use App\Services\Partners\PartnerAgreement;
-use App\Services\Partners\PartnerOnboarding;
 use BackedEnum;
 use Filament\Forms\Components\Checkbox;
 use Filament\Forms\Components\TextInput;

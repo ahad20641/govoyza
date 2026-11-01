@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Domain\Catalogue\SupplierOfferWorkflow;
 use App\Enums\Currency;
 use App\Enums\PartnerStatus;
 use App\Enums\ProductStatus;
@@ -11,7 +12,6 @@ use App\Models\OfferRevision;
 use App\Models\Partner;
 use App\Models\Product;
 use App\Models\VisaType;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use Illuminate\Auth\Access\AuthorizationException;
 use Tests\TestCase;
 

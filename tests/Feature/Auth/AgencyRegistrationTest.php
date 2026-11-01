@@ -74,7 +74,7 @@ class AgencyRegistrationTest extends TestCase
     {
         $user = User::factory()->agency()->status(UserStatus::Pending)->create();
 
-        $this->actingAs($user)->get('/agency')->assertRedirect(route('account.pending'));
+        $this->actingAs($user)->get('/agent')->assertRedirect(route('account.pending'));
         $this->actingAs($user)->get('/account/pending')->assertOk()->assertSee('Pending approval');
     }
 }

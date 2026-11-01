@@ -5,13 +5,23 @@ namespace App\Models;
 use App\Casts\MoneyCast;
 use App\Enums\MarkupType;
 use App\Enums\ProductStatus;
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * What customers buy: one country + visa type (+ nationality) under Govoyza's own name and price.
+ * The suppliers behind it are SupplierOffers and never appear here (CLAUDE.md rule 1).
+ * Public site, agent price list, admin catalogue. Task 1.9 — Products and supplier offers.
+ */
 class Product extends Model
 {
+    /** @use HasFactory<ProductFactory> */
+    use HasFactory;
+
     protected $hidden = ['supplier_offers'];
 
     protected $fillable = [
@@ -43,6 +53,16 @@ class Product extends Model
     public function supplierOffers(): HasMany
     {
         return $this->hasMany(SupplierOffer::class);
+    }
+
+    public function requirements(): HasMany
+    {
+        return $this->hasMany(Requirement::class)->orderBy('sort_order');
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
     }
 
     public function scopeLive(Builder $query): Builder

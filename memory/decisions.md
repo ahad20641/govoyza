@@ -152,3 +152,38 @@
 - Admin: Countries and Visa types resources (edit only, `catalog.manage`). Reference data stays public to read
   (`ReferenceDataPolicy`), but the admin screens check `canAccess()`.
 - Not seeded: Bangladesh districts (not in 1.8's scope; needed by courier/drop-off later).
+
+## 2026-11-01 — Skeleton first (Sprint S1), then internals by area
+
+Owner's call: speed matters, so build the whole structure as working empty shells first, then fill internals.
+- **S1 (one branch `feat/skeleton`, one PR, one staging deploy):** every public page, the customer (`/account`) and
+  agent (`/agent`) portals, partner and admin Filament pages, all data-model tables with models, factories and a demo
+  seeder. No business logic: pricing, state machine, payments and ledger are stubs that throw with a TODO naming
+  their task. Only smoke tests (right role 200/302, wrong role 403); full tests come with each internal task.
+- **After S1, one PR per area:** Catalogue+Pricing → Orders+Documents → Payments+Ledger → Notifications.
+  Small fixes are batched into the area PR. Claude merges to `develop` without waiting; `main` still needs the owner.
+- **Layout:** `app/Domain/{Catalogue,Orders,Pricing,Ledger,Partners,Agencies}` hold services, the state machine,
+  pricing and posting (each with a README). `app/Services/Catalogue` and `app/Services/Partners` moved there.
+  Models stay in `app/Models` and enums in `app/Enums` (Laravel/Filament conventions; moving them buys nothing).
+  Cross-cutting services (`Access`, `Audit`, `Auth`, `Money`) stay in `app/Services`.
+- **Partner portal stays Filament** (decided in 1.7). Its S1 pages (assigned jobs, earnings, performance) are
+  Filament pages/resources, not Blade controllers; `app/Http/Controllers/Partner` keeps only the invite link.
+- **URLs follow the blueprint:** customer portal `/client` → `/account`, agency portal `/agency` → `/agent`.
+  Route names `account.*` and `agent.*`.
+- **Legacy tables dropped** (migration `retire_legacy_tables`): `vendors`, `vendor_*`, `agency_vendor`,
+  `authorized_agencies`, `services`, `service_prices`, `agency_services`, `visa_rules`, `visa_documents`,
+  `applications`, `application_*`, `embassy_submissions`, `courier_tracking`, `pickup_locations`, `payments`,
+  `payment_transactions`, `receipts`, `deposit_requests`, `ledger_accounts`, `ledger_transactions`, `reports`,
+  `chat_*`. No code read them, and `payments`/`ledger_accounts` blocked the data-model tables of the same name.
+  Staging held only test rows; production has never run a migration, so nothing real is lost. The migration is
+  one-way (`down()` doesn't recreate them). The "convert decimal money columns" sub-tasks on 1.12/1.17/1.23/1.24
+  are done by this; `agencies.credit_limit` became `credit_limit_minor` + `currency`. The old migration files keep
+  their decimals and stay on `RepositoryGuardsTest::LEGACY_DECIMAL_MIGRATIONS` (history, not new columns).
+  Kept: `clients`, `districts`, `settings`, `notification_templates`, `agencies`, `agency_documents`.
+- **Demo data:** `DemoSeeder` (fake countries' products, a demo partner, customer, agency and orders, all
+  `is_demo`/"Demo" named). It runs on every deploy but does nothing unless `APP_ENV` is `local` or `staging`.
+  Demo logins get random passwords; the owner sets one with `bash deploy/password.sh reset-password EMAIL`.
+- **Admin navigation groups:** Today, Catalogue, Orders, Users, Accounting, CMS, Settings (replaces Finance,
+  Partners and System).
+- Public site keeps the hand-written `public/css/govoyza.css` (no Vite build on the server); the mobile menu is a
+  `<details>` element, so it works under the `script-src 'self'` CSP with no JavaScript.

@@ -2,8 +2,8 @@
 
 namespace App\Filament\Partner\Resources\SupplierOffers\Pages;
 
+use App\Domain\Catalogue\SupplierOfferWorkflow;
 use App\Filament\Partner\Resources\SupplierOffers\SupplierOfferResource;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use App\Support\Money\Money;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;

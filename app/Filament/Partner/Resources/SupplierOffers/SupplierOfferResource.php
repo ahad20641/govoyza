@@ -24,7 +24,7 @@ class SupplierOfferResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = null;
 
-    protected static string|UnitEnum|null $navigationGroup = 'Offers';
+    protected static string|UnitEnum|null $navigationGroup = 'My services';
 
     protected static ?string $recordTitleAttribute = 'id';
 
@@ -63,7 +63,7 @@ class SupplierOfferResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery()->with(['product.country', 'product.visaType']);
+        $query = parent::getEloquentQuery()->with(['product.country', 'product.visaType', 'revisions']);
         $partnerId = auth()->user()?->partner_id;
 
         return $partnerId === null ? $query->whereRaw('1 = 0') : $query->where('partner_id', $partnerId);

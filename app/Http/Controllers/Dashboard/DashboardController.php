@@ -8,25 +8,14 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Phase 1: role-gated dashboard shells. Each portal is filled in by its
- * own task (customer 1.22, agency Phase 2). Staff and partners use their
- * Filament panels on the admin and partner domains instead.
+ * Sends a signed-in user to their own portal (/account, /agent, or the partner/admin panels), and shows
+ * the "pending approval" page to agencies waiting for admin. govoyza.com. Tasks 1.5, S1.
  */
 class DashboardController extends Controller
 {
     public function redirect(Request $request): RedirectResponse
     {
         return redirect()->route($request->user()->dashboardRoute());
-    }
-
-    public function client(): View
-    {
-        return view('dashboards.shell', ['portal' => 'Client', 'title' => 'My Dashboard']);
-    }
-
-    public function agency(): View
-    {
-        return view('dashboards.shell', ['portal' => 'Agency', 'title' => 'Agency Dashboard']);
     }
 
     public function pending(Request $request): View

@@ -2,10 +2,11 @@
 
 namespace App\Filament\Partner\Resources\SupplierOffers\Tables;
 
+use App\Domain\Catalogue\SupplierOfferWorkflow;
+use App\Enums\OfferRevisionStatus;
 use App\Enums\SupplierOfferStatus;
 use App\Filament\Partner\Resources\SupplierOffers\SupplierOfferResource;
 use App\Models\SupplierOffer;
-use App\Services\Catalogue\SupplierOfferWorkflow;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -24,6 +25,16 @@ class SupplierOffersTable
                 TextColumn::make('cost')->label('Your cost')->state(fn (SupplierOffer $record) => $record->cost?->format() ?? '—'),
                 TextColumn::make('processing_days')->label('Processing days'),
                 TextColumn::make('status')->badge()->formatStateUsing(fn ($state) => $state instanceof SupplierOfferStatus ? ucfirst($state->value) : ucfirst((string) $state)),
+                TextColumn::make('review_note')->label('Review note')->state(function (SupplierOffer $record): ?string {
+                    if (filled($record->review_comment)) {
+                        return $record->review_comment;
+                    }
+
+                    return $record->revisions
+                        ->sortByDesc('submitted_at')
+                        ->first(fn ($revision) => $revision->status === OfferRevisionStatus::ChangesRequested)
+                        ?->comment;
+                })->wrap()->placeholder('—'),
                 TextColumn::make('revisions_count')->counts('revisions')->label('Revisions'),
             ])
             ->recordActions([
@@ -31,7 +42,7 @@ class SupplierOffersTable
                 Action::make('submitForReview')
                     ->label('Submit for review')
                     ->requiresConfirmation()
-                    ->visible(fn (SupplierOffer $record) => in_array($record->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::Rejected], true))
+                    ->visible(fn (SupplierOffer $record) => in_array($record->status, [SupplierOfferStatus::Draft, SupplierOfferStatus::ChangesRequested], true))
                     ->action(function (SupplierOffer $record): void {
                         app(SupplierOfferWorkflow::class)->submitForReview(auth()->user()->partner, $record);
                         Notification::make()->title('Offer submitted for review')->success()->send();

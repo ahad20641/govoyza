@@ -52,6 +52,7 @@ return [
         'payments.manage' => ['Manage payments', ['finance']],
         'ledger.manage' => ['Manage ledgers & deposits', ['finance']],
         'notifications.manage' => ['Manage notification templates', ['operations']],
+        'cms.manage' => ['Manage CMS pages and blog posts', ['operations']],
         'reports.view_all' => ['View system reports', ['finance']],
         'settings.manage' => ['Manage system settings', []],
         'audit.view' => ['View audit logs', []],

@@ -2,9 +2,9 @@
 
 namespace App\Filament\Partner\Pages;
 
+use App\Domain\Partners\PartnerOnboarding;
 use App\Enums\PartnerDocumentType;
 use App\Filament\Partner\Pages\Concerns\PartnerFormPage;
-use App\Services\Partners\PartnerOnboarding;
 use BackedEnum;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;

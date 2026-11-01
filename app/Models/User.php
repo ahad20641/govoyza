@@ -106,10 +106,26 @@ class User extends Authenticatable implements FilamentUser, HasAppAuthentication
         return $this->hasOne(Agency::class);
     }
 
-    /** Legacy inherited table; replaced by partner() and removed with the old vendor_* tables. */
-    public function vendor(): HasOne
+    /** Agency this user works for as a sub-user (Phase 2). The owner is linked through agency() instead. */
+    public function parentAgency(): BelongsTo
     {
-        return $this->hasOne(Vendor::class);
+        return $this->belongsTo(Agency::class, 'agency_id');
+    }
+
+    /** The agency whose portal this user sees: the one they own, else the one they belong to. */
+    public function currentAgency(): ?Agency
+    {
+        return $this->agency ?? $this->parentAgency;
+    }
+
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function savedTravellers(): HasMany
+    {
+        return $this->hasMany(SavedTraveller::class);
     }
 
     public function partner(): BelongsTo

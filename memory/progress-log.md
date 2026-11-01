@@ -3,6 +3,15 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (Sprint S1 — full skeleton)
+- Owner changed the approach to skeleton first; logged as a decision, CLAUDE.md gained the code-layout/comment rules,
+  phase-1 and roadmap now list S1 then Areas A–D. Committed the planning kit (it had never been committed).
+- Picked up the earlier session's uncommitted 1.10 review queue (148 tests green) and shipped it inside the S1 PR.
+- S1: dropped unused legacy tables; added every data-model table with models, factories and `app/Domain` stubs
+  (`NotBuiltYet`); public site, `/account`, `/agent`, admin groups and partner jobs/earnings/performance as shells;
+  `DemoSeeder` for local/staging. 157 tests pass (smoke tests: right role 200/302, wrong role 403), Pint passes.
+- Next: Area A — Catalogue + Pricing (1.11, 1.12, 1.13, 1.14, 1.15) on `feat/catalogue-pricing`.
+
 ## 2026-11-01 (task 1.9 products and supplier offers)
 - Added products, supplier offers, offer revisions, partner ownership policies, and Filament product/partner-offer screens.
 - Draft offers can be submitted for review. Live-offer edits create pending revisions without mutating active terms; JSON serialization hides partner and cost details.

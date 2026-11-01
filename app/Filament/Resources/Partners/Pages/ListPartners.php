@@ -2,10 +2,10 @@
 
 namespace App\Filament\Resources\Partners\Pages;
 
+use App\Domain\Partners\PartnerInvitations;
 use App\Filament\Resources\Partners\PartnerResource;
 use App\Models\Partner;
 use App\Models\User;
-use App\Services\Partners\PartnerInvitations;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
