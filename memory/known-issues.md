@@ -47,7 +47,16 @@
 - A deploy that adds a package with a service provider logs `Class … not found` from `artisan down` (old `vendor/`,
   new code). Harmless: `down` is `|| true`, so that one deploy just runs without maintenance mode.
 
+## Tests
+- `php artisan test` can inherit local `.env` values into the test process and override PHPUnit's `<env>` defaults. Set `APP_ENV=testing`, `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`, and `GOVOYZA_DOMAIN=localhost` for isolated local runs; leave CI's explicit MySQL variables intact.
+- `RefreshDatabase` migrates and seeds **once per run**, not per test, so a per-class `$seeder` override only works
+  if that class runs first. Seed extra data inside the test (`$this->seed(X::class)`) instead.
+- Full-cost bcrypt in a loop is slow (≈0.25s per check); use `['cost' => 4]` for hashes made in tests.
+
 ## Filament
+- `Forms\Components\Placeholder` is deprecated in Filament 5: use `Infolists\Components\TextEntry::make()->state(...)`.
+- A resource whose policy allows public `viewAny` (reference data) still needs `canAccess()` to keep the admin
+  screen to the right staff.
 - A `Route::get('/')` on the admin domain in `routes/web.php` silently replaces the panel's dashboard route
   (same host + URI). Keep `web.php` free of admin-domain routes.
 - Widgets load lazily by default (a second Livewire request), so their content isn't in the first HTML. Set

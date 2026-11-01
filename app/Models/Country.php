@@ -48,6 +48,11 @@ class Country extends Model
         return $this->hasMany(District::class);
     }
 
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function scopeActive(Builder $q): Builder
     {
         return $q->where('is_active', true);

@@ -3,6 +3,19 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.9 products and supplier offers)
+- Added products, supplier offers, offer revisions, partner ownership policies, and Filament product/partner-offer screens.
+- Draft offers can be submitted for review. Live-offer edits create pending revisions without mutating active terms; JSON serialization hides partner and cost details.
+- PR #10. Verification: local migrations applied, 137 tests pass, Pint passes.
+- Next: task 1.10 Admin review queue; task 1.2 production and 1.2b remain owner-blocked.
+
+## 2026-11-01 (task 1.8 reference data)
+- Renamed inherited `visa_categories` → `visa_types` and `visa_types` → `visa_formats` to match the data model.
+- Seeded 250 countries, 199 nationalities, 7 visa types, 2 formats from `database/data/countries.php`; the seeder
+  runs on every deploy without overwriting admin edits. Countries and Visa types admin screens. PR #9.
+- Brought the test suite from 18s to 9s (low-cost bcrypt in staging-gate tests).
+- Next: 1.9 products and supplier offers.
+
 ## 2026-11-01 (task 1.7 partner portal)
 - Built the partner portal as a second Filament panel: invite-only join, KYC uploads, encrypted bank details,
   click-to-sign agreement, admin approve/suspend/reactivate, audited KYC downloads. PR #8. 122 tests.

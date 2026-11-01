@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-11-01
 **Current phase:** Phase 1 — MVP (see `planning/phase-1-mvp.md`)
-**Current task:** 1.8 Reference data. 1.7 is in PR #8 (merge after CI). 1.2 (production half) and 1.2b wait on the owner
-**Branch:** `develop` (no open PRs)
+**Current task:** 1.10 Admin review queue. 1.9 is in PR #10 (merge after CI); 1.2 (production half) and 1.2b wait on the owner
+**Branch:** `feat/1.9-products-and-supplier-offers`
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
@@ -22,8 +22,13 @@
   details, click-to-sign agreement; admin Partners resource (invite / approve / suspend / download KYC). Role is
   `partner` now (was `vendor`). Production `partner.govoyza.com/`, staging `staging.govoyza.com/partner`
 - Staging gate (Basic Auth, off until a hash is set) and the coming-soon page on govoyza.com
-- Local PHP 8.4 / SQLite: 122 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
-- Legacy `vendors` / `vendor_*` tables still exist, unused by new code; retire them in 1.9/1.17/1.20/1.24
+- Reference data (1.8): 250 countries (slug, region schengen/gcc, continent, SEO), 199 nationalities, 7 visa types,
+  2 visa formats. `ReferenceDataSeeder` runs on every deploy and keeps admin edits. Admin: Countries, Visa types
+- Catalogue (1.9): products and supplier offers with partner ownership; live-offer edits are pending revisions and
+  don't change current terms. Product and offer JSON hides supplier/cost details.
+- Local PHP 8.4 / SQLite: 137 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
+- Legacy tables still exist, unused by new code: `vendors`/`vendor_*`, `visa_rules`, `visa_documents`, `services`,
+  `service_prices`, `agency_services`, application tables. Retire them in 1.9/1.11/1.17/1.20/1.24
 - Inherited schema still has `decimal` money columns, converted per task (checkboxes on 1.12/1.17/1.23/1.24)
 
 ## Environments
@@ -57,6 +62,6 @@ page; it becomes the `app/public` symlink at production's first deploy. Hostinge
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. 1.8 Reference data (countries, visa types, nationalities + seeders)
-2. 1.9 Products and supplier offers (on `partners`)
-3. 1.10 Admin review queue
+1. 1.10 Admin review queue
+2. 1.11 Requirements checklist
+3. 1.12 Pricing engine
