@@ -125,7 +125,7 @@ becomes a symlink to that app's Laravel `public/` folder.
 See `.github/workflows/deploy.yml` and `deploy/post-deploy.sh`:
 1. CI: `composer install`, `npm ci && npm run build`, run tests + Pint.
 2. rsync code to the server (excluding `.env`, `storage/`, `.git`, `node_modules`, `tests`).
-3. On the server: maintenance mode → `composer install --no-dev` → `migrate --force` → `govoyza:sync-permissions` → cache config/routes/views/events → `queue:restart`.
+3. On the server: maintenance mode → `composer install --no-dev` → `migrate --force` → `govoyza:sync-permissions` → `db:seed --class=ReferenceDataSeeder` (idempotent) → cache config/routes/views/events → `queue:restart`.
 4. Health check: `curl $URL/up` must return 200, else the job fails.
 
 ## Changing `.env` on the server

@@ -28,7 +28,8 @@ class StagingGateTest extends TestCase
     {
         config([
             'govoyza.staging_gate.user' => 'govoyza',
-            'govoyza.staging_gate.password_hash' => password_hash(self::PASSWORD, PASSWORD_BCRYPT),
+            // Low cost keeps the 20-guess rate-limit test fast; the gate logic is the same.
+            'govoyza.staging_gate.password_hash' => password_hash(self::PASSWORD, PASSWORD_BCRYPT, ['cost' => 4]),
         ]);
     }
 
