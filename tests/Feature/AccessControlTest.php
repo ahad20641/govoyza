@@ -11,14 +11,14 @@ class AccessControlTest extends TestCase
 {
     public function test_guests_are_redirected_to_login(): void
     {
-        foreach (['/client', '/agency', '/vendor', '/admin', '/dashboard'] as $path) {
+        foreach (['/client', '/agency', '/vendor', '/dashboard'] as $path) {
             $this->get($path)->assertRedirect(route('login'));
         }
     }
 
     public function test_each_role_is_confined_to_its_portal(): void
     {
-        $portals = ['client' => '/client', 'agency' => '/agency', 'vendor' => '/vendor', 'owner' => '/admin'];
+        $portals = ['client' => '/client', 'agency' => '/agency', 'vendor' => '/vendor'];
 
         foreach ($portals as $role => $own) {
             $user = User::factory()->role(RoleSlug::from($role))->create();
@@ -35,8 +35,9 @@ class AccessControlTest extends TestCase
         foreach (RoleSlug::staff() as $role) {
             $staff = User::factory()->role($role)->create();
 
-            $this->actingAs($staff)->get('/admin')->assertOk();
-            $this->actingAs($staff)->get('/dashboard')->assertRedirect(route('admin.dashboard'));
+            // The old /admin shell is gone; staff work on the admin domain (AdminConsoleTest).
+            $this->actingAs($staff)->get('/admin')->assertNotFound();
+            $this->actingAs($staff)->get('/dashboard')->assertRedirect(route('filament.admin.pages.dashboard'));
             foreach (['/client', '/agency', '/vendor'] as $path) {
                 $this->actingAs($staff)->get($path)->assertForbidden();
             }

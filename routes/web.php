@@ -58,10 +58,6 @@ Route::domain(config('govoyza.domains.main'))->group(function () {
             Route::prefix('vendor')->name('vendor.')->middleware('type:partner_user')->group(function () {
                 Route::get('/', [DashboardController::class, 'vendor'])->name('dashboard');
             });
-
-            Route::prefix('admin')->name('admin.')->middleware(['type:admin', 'can:admin.access'])->group(function () {
-                Route::get('/', [DashboardController::class, 'admin'])->name('dashboard');
-            });
         });
     });
 });
@@ -70,6 +66,4 @@ Route::domain(config('govoyza.domains.partner'))->group(function () {
     Route::view('/', 'home')->name('partner.home');
 });
 
-Route::domain(config('govoyza.domains.admin'))->group(function () {
-    Route::view('/', 'home')->name('admin.home');
-});
+// The admin domain is the Filament panel: App\Providers\Filament\AdminPanelProvider.

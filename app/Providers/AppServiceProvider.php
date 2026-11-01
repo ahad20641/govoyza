@@ -7,9 +7,15 @@ use App\Models\District;
 use App\Models\Nationality;
 use App\Models\User;
 use App\Policies\ReferenceDataPolicy;
+use App\Services\Audit\AdminWriteRecorder;
+use App\Services\Audit\AuditLogger;
+use Filament\Facades\Filament;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
@@ -28,6 +34,25 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->isProduction()) {
             URL::forceScheme('https');
         }
+
+        // Every create/update/delete made in the admin console is audited.
+        foreach (['created', 'updated', 'deleted'] as $event) {
+            Event::listen("eloquent.{$event}: *", function (string $name, array $payload) use ($event) {
+                app(AdminWriteRecorder::class)->record($event, $payload[0]);
+            });
+        }
+
+        // Admin console sign-ins (Filament's own login page) are audited like the site's.
+        Event::listen(Login::class, function (Login $e) {
+            if (Filament::getCurrentPanel()?->getId() === 'admin') {
+                app(AuditLogger::class)->log('admin.login', $e->user, userId: $e->user->getAuthIdentifier());
+            }
+        });
+        Event::listen(Failed::class, function (Failed $e) {
+            if (Filament::getCurrentPanel()?->getId() === 'admin') {
+                app(AuditLogger::class)->log('admin.login_failed', meta: ['email' => strtolower((string) ($e->credentials['email'] ?? ''))]);
+            }
+        });
 
         // Strong password policy everywhere Password::defaults() is used.
         Password::defaults(fn () => $this->app->isProduction()

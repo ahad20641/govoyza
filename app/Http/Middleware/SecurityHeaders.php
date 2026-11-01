@@ -8,9 +8,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 class SecurityHeaders
 {
-    public function handle(Request $request, Closure $next): Response
+    /**
+     * Usage: 'SecurityHeaders' for the site, SecurityHeaders::class.':panel' for Filament.
+     * Filament (Livewire + Alpine) needs inline scripts and eval, so panels get a looser
+     * script-src; everything else stays the same.
+     */
+    public function handle(Request $request, Closure $next, ?string $variant = null): Response
     {
         $response = $next($request);
+
+        $scripts = $variant === 'panel' ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'" : "script-src 'self'";
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
@@ -21,7 +28,7 @@ class SecurityHeaders
             "img-src 'self' data: blob:",
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
             "font-src 'self' https://fonts.gstatic.com",
-            "script-src 'self'",
+            $scripts,
             "connect-src 'self'",
             "frame-ancestors 'none'",
             "form-action 'self'",

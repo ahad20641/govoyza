@@ -85,3 +85,27 @@
   used **only inside the Filament panels**; the public site and customer/agent portals stay plain Blade.
 - Authorisation stays ours: Filament resources call the existing Policies and `config/permissions.php`.
   No `spatie/laravel-permission`, no `filament-shield`.
+
+## 2026-11-01 — Admin console details (task 1.6)
+
+- Filament **v5.11.0** installed (Livewire 4.4.8), constraint `^5.11`. Panel `admin` on `config('govoyza.domains.admin')`
+  at path `/`, so `admin.govoyza.com/` is the dashboard. The old `/admin` shell on the main domain is removed.
+- Staff sign in on the admin domain only. Signing in on the public site as staff signs them straight out and
+  redirects to the admin login, because the admin console has its own session cookie and requires 2FA.
+- **2FA:** Filament app (TOTP) authentication, `isRequired: true`, with hashed recovery codes. Stored in the existing
+  encrypted `two_factor_*` user columns (`two_factor_recovery_codes` cast changed to `encrypted:array`).
+- **Access:** `User::canAccessPanel` = admin type + active + `admin.access` (Owner implicit). Resources use the
+  existing Policies, so the role matrix in `config/permissions.php` applies unchanged.
+- **IP allowlist:** `GOVOYZA_ADMIN_IPS` (IPs/CIDR, comma-separated; empty = off). Other IPs get a 404. Persistent
+  middleware, so Livewire updates are covered too. Behind a CDN this only works once its IPs are in `TRUSTED_PROXIES`.
+- **Audit of every admin write:** wildcard Eloquent `created/updated/deleted` listener → `AdminWriteRecorder`, active
+  only while Filament's current panel is `admin` (set by persistent middleware, so it also covers Livewire updates).
+  Hidden attributes and known secret keys are masked. Admin logins and failed logins are audited too.
+- **CSP:** the panel gets `script-src 'self' 'unsafe-inline' 'unsafe-eval'` (Livewire/Alpine need them); the public
+  site keeps `script-src 'self'`.
+- Filament assets are gitignored and published on the server by `post-deploy.sh` (`filament:assets`).
+- First resources: **Exchange rates** (list + add only; history is append-only; Finance/Owner) and a read-only
+  **Audit log** (Owner).
+- **Staging admin URL:** staging has no admin subdomain (subdomain roots are forced inside production's web root),
+  so the panel path is configurable: `GOVOYZA_ADMIN_PATH=admin` + `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com` →
+  `staging.govoyza.com/admin`. Production leaves the path empty. The partner panel (1.7) will use the same pattern.

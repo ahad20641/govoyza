@@ -15,7 +15,11 @@ class DomainRoutingTest extends TestCase
             ->assertOk()
             ->assertHeader('X-Robots-Tag', 'noindex');
 
+        // The admin domain is the Filament panel: guests go to its login page.
         $this->get('http://'.config('govoyza.domains.admin').'/')
+            ->assertRedirect(route('filament.admin.auth.login'))
+            ->assertHeader('X-Robots-Tag', 'noindex');
+        $this->get('http://'.config('govoyza.domains.admin').'/login')
             ->assertOk()
             ->assertHeader('X-Robots-Tag', 'noindex');
     }
