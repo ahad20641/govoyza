@@ -3,6 +3,13 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.5 auth and roles)
+- Added `users.type` and staff roles. `super_admin` was renamed to `owner` by migration; new `operations` and `finance` roles are least privilege. Each role maps to one type, and the model enforces it.
+- Replaced signed email-verification links with 6-digit OTP codes. Only an HMAC is stored, with a 10-minute TTL, single use, a 5-guess cap and rate limits.
+- Added policies for every existing model. `create-admin` takes `--role`. `post-deploy.sh` now syncs permissions.
+- Kept the app's own RBAC instead of spatie (as already decided). 80 tests pass. PR #3 is stacked on PR #2.
+- Next: owner merges #1 → #2 → #3; then 1.6 Admin console.
+
 ## 2026-11-01 (staging live)
 - Server setup over SSH: `app/` and `staging-app/` folders outside `public_html`, staging web root symlinked to
   `staging-app/public`, both `.env` files written with an empty DB_PASSWORD (owner typed it; the first nano attempt didn't save).

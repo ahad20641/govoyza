@@ -12,6 +12,11 @@
   (`GOVOYZA_DOMAIN_PUBLIC/_PARTNER/_ADMIN`, `GOVOYZA_DEFAULT_CURRENCY` vs `GOVOYZA_DOMAIN`,
   `GOVOYZA_PARTNER_DOMAIN`, `GOVOYZA_ADMIN_DOMAIN`, `GOVOYZA_CURRENCY`). Fix the template before writing server `.env` files (task 1.2).
 
+## Tooling
+- In this Windows Bash tool, a long command with several quoted heredocs (`<<'EOF'`) holding PHP code can
+  fail to parse ("unexpected EOF while looking for matching `'`"), and then nothing in it runs. Write PHP files
+  with the Write tool instead.
+
 ## GitHub
 - Required reviewers on an environment need a public repo or a paid plan (Pro/Team). While the repo
   was private on Free, the API returned 422. It's now public and the `production` rule is in place.
