@@ -36,7 +36,11 @@ There is **no default admin account or password** anywhere in the code. The seed
 
 | Command | Purpose |
 |---|---|
-| `php artisan govoyza:create-admin [--role=operations]` | Create a staff account: `owner` (default), `operations` or `finance` (min 12 chars, mixed case, number, symbol) |
+| `php artisan govoyza:create-admin [--role=operations]` | Create a staff account: `owner` (default), `operations` or `finance` (min 12 chars, mixed case, number, symbol). Password asked twice, hidden |
+| `php artisan govoyza:reset-password {email}` | Set a new password (asked twice, hidden) and sign the account out everywhere |
+| `php artisan govoyza:send-test-email {to}` | Check the mail settings |
+
+On Hostinger, PHP can't hide input, so use `--password-stdin` with the shell's `read -s`; see `deploy/hostinger.md`, "Staff passwords".
 | `php artisan govoyza:sync-permissions` | Re-sync roles + `config/permissions.php` after adding permissions |
 | `php artisan test` | Run the test suite (SQLite in-memory) |
 

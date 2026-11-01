@@ -30,11 +30,15 @@ class SystemSetupTest extends TestCase
 
     public function test_create_admin_command_enforces_strong_password(): void
     {
-        $this->artisan('govoyza:create-admin', ['--name' => 'Ops', '--email' => 'ops@govoyza.test', '--password' => 'weak'])
+        $this->artisan('govoyza:create-admin', ['--name' => 'Ops', '--email' => 'ops@govoyza.test'])
+            ->expectsQuestion('Password (hidden)', 'weak')
+            ->expectsQuestion('Password again', 'weak')
             ->assertFailed();
         $this->assertSame(0, User::count());
 
-        $this->artisan('govoyza:create-admin', ['--name' => 'Ops', '--email' => 'ops@govoyza.test', '--password' => 'Str0ng!Passw0rd'])
+        $this->artisan('govoyza:create-admin', ['--name' => 'Ops', '--email' => 'ops@govoyza.test'])
+            ->expectsQuestion('Password (hidden)', 'Str0ng!Passw0rd')
+            ->expectsQuestion('Password again', 'Str0ng!Passw0rd')
             ->assertSuccessful();
 
         $admin = User::firstWhere('email', 'ops@govoyza.test');
