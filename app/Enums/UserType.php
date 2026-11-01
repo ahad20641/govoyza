@@ -30,7 +30,7 @@ enum UserType: string
             self::Customer => 'client.dashboard',
             self::AgentUser => 'agency.dashboard',
             self::PartnerUser => 'vendor.dashboard',
-            self::Admin => 'admin.dashboard',
+            self::Admin => 'filament.admin.pages.dashboard', // admin.govoyza.com (Filament)
         };
     }
 }

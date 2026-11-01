@@ -2,7 +2,7 @@
 
 Laravel 13 · PHP 8.4+ · MySQL 8 · plain HTML/CSS/JS front end (no build step required).
 
-Three portals — **B2C Client**, **B2B Travel Agency**, **Admin** (Owner / Operations / Finance; plus a Vendor role) — built in the
+Three portals — **B2C Client**, **B2B Travel Agency**, **Admin** (Owner / Operations / Finance; Filament 5 console on `admin.govoyza.com` with required 2FA; plus a Vendor role) — built in the
 15 phases defined in the product spec.
 
 ## Build status

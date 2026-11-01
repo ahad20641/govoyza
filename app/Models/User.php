@@ -9,6 +9,10 @@ use App\Enums\UserType;
 use App\Notifications\EmailVerificationCode;
 use App\Services\Auth\OneTimePasswords;
 use Database\Factories\UserFactory;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthentication;
+use Filament\Auth\MultiFactor\App\Contracts\HasAppAuthenticationRecovery;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +23,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LogicException;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable implements FilamentUser, HasAppAuthentication, HasAppAuthenticationRecovery, MustVerifyEmail
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, SoftDeletes;
@@ -49,7 +53,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'type' => UserType::class,
             'two_factor_enabled' => 'boolean',
             'two_factor_secret' => 'encrypted',
-            'two_factor_recovery_codes' => 'encrypted',
+            'two_factor_recovery_codes' => 'encrypted:array',
             'is_demo' => 'boolean',
         ];
     }
@@ -158,6 +162,48 @@ class User extends Authenticatable implements MustVerifyEmail
     public function dashboardRoute(): string
     {
         return $this->type?->dashboardRoute() ?? 'home';
+    }
+
+    /** Admin console: active staff with admin.access. The partner panel (1.7) gets its own rule. */
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return $panel->getId() === 'admin'
+            && $this->isStaff()
+            && $this->status === UserStatus::Active
+            && ($this->isOwner() || $this->hasPermission('admin.access'));
+    }
+
+    // Filament app (TOTP) 2FA, stored in the encrypted two_factor_* columns.
+
+    public function getAppAuthenticationSecret(): ?string
+    {
+        return $this->two_factor_secret;
+    }
+
+    public function saveAppAuthenticationSecret(#[\SensitiveParameter] ?string $secret): void
+    {
+        $this->two_factor_secret = $secret;
+        $this->two_factor_enabled = $secret !== null;
+        $this->two_factor_confirmed_at = $secret !== null ? now() : null;
+        $this->save();
+    }
+
+    public function getAppAuthenticationHolderName(): string
+    {
+        return $this->email;
+    }
+
+    /** @return array<string>|null hashed codes */
+    public function getAppAuthenticationRecoveryCodes(): ?array
+    {
+        return $this->two_factor_recovery_codes;
+    }
+
+    /** @param  array<string>|null  $codes  hashed codes */
+    public function saveAppAuthenticationRecoveryCodes(#[\SensitiveParameter] ?array $codes): void
+    {
+        $this->two_factor_recovery_codes = $codes;
+        $this->save();
     }
 
     /** Email is verified with a 6-digit code instead of a signed link. */

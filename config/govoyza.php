@@ -41,6 +41,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Admin console
+    |--------------------------------------------------------------------------
+    |
+    | Optional IP allowlist for admin.govoyza.com: comma-separated IPs or CIDR
+    | ranges. Empty = no restriction (2FA is always required).
+    |
+    */
+
+    'admin' => [
+        // URL prefix of the console on its domain. Production: '' (admin.govoyza.com/).
+        // Staging has no admin subdomain, so it sets GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com
+        // and GOVOYZA_ADMIN_PATH=admin (staging.govoyza.com/admin).
+        'path' => trim((string) env('GOVOYZA_ADMIN_PATH', ''), '/'),
+        'allowed_ips' => array_values(array_filter(array_map('trim', explode(',', (string) env('GOVOYZA_ADMIN_IPS', ''))))),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Staging gate
     |--------------------------------------------------------------------------
     |

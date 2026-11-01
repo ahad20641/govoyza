@@ -27,6 +27,7 @@ trap '$PHP artisan up || true' EXIT
 # Hostinger disables proc_open, so Composer can't run its scripts; run package discovery directly.
 $COMPOSER install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
 $PHP artisan package:discover --ansi
+$PHP artisan filament:assets    # Filament's CSS/JS/fonts into public/ (gitignored; Composer scripts can't run here)
 
 $PHP artisan migrate --force
 $PHP artisan govoyza:sync-permissions   # idempotent: roles + config/permissions.php

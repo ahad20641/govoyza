@@ -13,7 +13,7 @@ use Illuminate\Http\Request;
 class AuditLogger
 {
     private const MASKED = ['password', 'password_confirmation', 'remember_token', 'two_factor_secret',
-        'two_factor_recovery_codes', 'passport_number', 'token', 'secret', 'api_key'];
+        'two_factor_recovery_codes', 'passport_number', 'token', 'secret', 'api_key', 'code_hash'];
 
     public function __construct(private readonly Request $request) {}
 

@@ -162,6 +162,15 @@ bash deploy/password.sh staging-password
 The command refreshes the config cache itself and refuses to run when `APP_ENV=production`. To turn the gate
 off, delete the `GOVOYZA_STAGING_PASSWORD_HASH` line and run `php artisan config:cache`.
 
+## Admin console (Filament)
+- Production: `https://admin.govoyza.com/` (`GOVOYZA_ADMIN_DOMAIN=admin.govoyza.com`, no `GOVOYZA_ADMIN_PATH`).
+- Staging has no admin subdomain, so its `.env` has `GOVOYZA_ADMIN_DOMAIN=staging.govoyza.com` and
+  `GOVOYZA_ADMIN_PATH=admin`, which puts the console at `https://staging.govoyza.com/admin`.
+- Sign in there with a staff account (`create-admin`). The first sign-in makes you set up an authenticator app
+  (2FA is required) and shows recovery codes once. Keep them offline.
+- Optional IP allowlist: `GOVOYZA_ADMIN_IPS=1.2.3.4,10.0.0.0/8`, then `php artisan config:cache`.
+- Filament's CSS/JS are published on each deploy by `post-deploy.sh` (`filament:assets`).
+
 ## Coming-soon page (production, until the first deploy)
 `deploy/coming-soon/` (`index.html` + `.htaccess`) is copied into `~/domains/govoyza.com/public_html`. The
 `.htaccess` adds `noindex` for the partner./admin. hosts, which share that web root. Hostinger's placeholder is

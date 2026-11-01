@@ -18,7 +18,6 @@ class LoginTest extends TestCase
             [User::factory()->create(), '/client'],
             [User::factory()->agency()->create(), '/agency'],
             [User::factory()->vendor()->create(), '/vendor'],
-            [User::factory()->owner()->create(), '/admin'],
         ];
 
         foreach ($cases as [$user, $path]) {
@@ -29,7 +28,18 @@ class LoginTest extends TestCase
         }
 
         $this->assertNotNull(User::first()->last_login_at);
-        $this->assertSame(4, AuditLog::where('action', 'auth.login')->count());
+        $this->assertSame(3, AuditLog::where('action', 'auth.login')->count());
+    }
+
+    public function test_staff_are_sent_to_the_admin_console_to_sign_in(): void
+    {
+        $owner = User::factory()->owner()->create();
+
+        $this->post('/login', ['email' => $owner->email, 'password' => 'password'])
+            ->assertRedirect(route('filament.admin.auth.login'));
+
+        // Not signed in on the public site: the admin console has its own session and 2FA.
+        $this->assertGuest();
     }
 
     public function test_wrong_password_fails_and_is_audited(): void

@@ -21,6 +21,15 @@ class AuthenticatedSessionController extends Controller
     {
         $user = $request->authenticate($audit);
 
+        // Staff sign in on the admin console, which has its own session and requires 2FA.
+        if ($user->isStaff()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->away(route('filament.admin.auth.login'));
+        }
+
         // Prevent session fixation.
         $request->session()->regenerate();
 
