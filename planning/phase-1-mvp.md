@@ -8,7 +8,7 @@ Speed matters, so the whole structure is built as working empty shells first, th
 time (decision in `memory/decisions.md`). Each step is one branch and one PR; small fixes ride along in the area PR.
 Claude merges to `develop` once CI passes; `main` needs the owner.
 
-- [ ] **S1 Full skeleton** (`feat/skeleton`) — every public page, `/account` and `/agent` portals, partner and admin
+- [x] **S1 Full skeleton** (`feat/skeleton`) — every public page, `/account` and `/agent` portals, partner and admin
   Filament pages, all `data-model.md` tables with models, relationships, factories and a demo seeder. Business
   logic stubbed with TODOs naming their task. Smoke tests only: each route 200/302 for the right role, 403 for the
   wrong one. Placeholder text says "Coming in task X.Y".

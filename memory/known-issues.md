@@ -16,6 +16,9 @@
 - In this Windows Bash tool, a long command with several quoted heredocs (`<<'EOF'`) holding PHP code can
   fail to parse ("unexpected EOF while looking for matching `'`"), and then nothing in it runs. Write PHP files
   with the Write tool instead.
+- Same for Python generators inline in a heredoc: write the script to the scratchpad with the Write tool and run it.
+  Python on this machine writes the Windows codepage by default: always pass `encoding='utf-8'` (an em dash came
+  out as byte 0x97 once).
 
 ## GitHub
 - Stacked PRs: merging the bottom PR does not retarget the ones above it. PR #2 was merged into the dead
@@ -48,12 +51,17 @@
   new code). Harmless: `down` is `|| true`, so that one deploy just runs without maintenance mode.
 
 ## Tests
+- `db:seed` (and `$this->seed()`) asks for confirmation when `APP_ENV=production`, which throws in tests. Call
+  `app(SomeSeeder::class)->run()` directly to test a seeder's production guard.
+- `actingAs()` sticks for the rest of the test, so "guest gets redirected" checks must run before any `actingAs()`.
 - `php artisan test` can inherit local `.env` values into the test process and override PHPUnit's `<env>` defaults. Set `APP_ENV=testing`, `DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`, and `GOVOYZA_DOMAIN=localhost` for isolated local runs; leave CI's explicit MySQL variables intact.
 - `RefreshDatabase` migrates and seeds **once per run**, not per test, so a per-class `$seeder` override only works
   if that class runs first. Seed extra data inside the test (`$this->seed(X::class)`) instead.
 - Full-cost bcrypt in a loop is slow (≈0.25s per check); use `['cost' => 4]` for hashes made in tests.
 
 ## Filament
+- A resource whose `getEloquentQuery()` is scoped to the user (partner jobs) answers **404**, not 403, for someone
+  else's record. That's the intended behaviour (record existence isn't revealed); test for 404.
 - `Forms\Components\Placeholder` is deprecated in Filament 5: use `Infolists\Components\TextEntry::make()->state(...)`.
 - A resource whose policy allows public `viewAny` (reference data) still needs `canAccess()` to keep the admin
   screen to the right staff.
