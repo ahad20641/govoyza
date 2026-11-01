@@ -27,7 +27,7 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 - [x] **1.7 Partner portal (Filament panel on partner domain)** — invite-link registration, KYC upload, bank details, e-sign agreement (click-to-sign with name, timestamp, IP, agreement version), status Pending → Active by admin. 2FA required.
 
 ## 1C · Catalogue
-- [ ] **1.8 Reference data** — countries (with region, e.g. Schengen), visa types, nationalities. Seeders for all countries + the 7 visa types.
+- [x] **1.8 Reference data** — countries (with region, e.g. Schengen), visa types, nationalities. Seeders for all countries + the 7 visa types.
 - [ ] **1.9 Products and supplier offers** — see `data-model.md`. Partner creates/edits offers (Draft → Pending review). Edits to a Live offer create a pending revision; live version unchanged until approved.
 - [ ] **1.10 Admin review queue** — side-by-side compare with other offers for same country + visa type + nationality. Approve / Request changes (comment) / Reject. On approve: set B2C + B2B markup, public name/description, primary/backup priority, publish product. Cost increases flagged.
 - [ ] **1.11 Requirements checklist** — per-product requirement items (doc type, required, rules: max size, formats, passport validity months).

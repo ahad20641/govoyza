@@ -6,6 +6,8 @@ use App\Models\Country;
 use App\Models\District;
 use App\Models\Nationality;
 use App\Models\User;
+use App\Models\VisaFormat;
+use App\Models\VisaType;
 use App\Policies\ReferenceDataPolicy;
 use App\Services\Audit\AuditLogger;
 use App\Services\Audit\PanelWriteRecorder;
@@ -85,8 +87,8 @@ class AppServiceProvider extends ServiceProvider
             Limit::perHour(10)->by('otp-send|'.$r->user()?->id),
         ]);
 
-        // Country, Nationality and District share one policy (no per-model rules yet).
-        foreach ([Country::class, Nationality::class, District::class] as $model) {
+        // Reference data shares one policy: public to read, catalog.manage to change.
+        foreach ([Country::class, Nationality::class, District::class, VisaType::class, VisaFormat::class] as $model) {
             Gate::policy($model, ReferenceDataPolicy::class);
         }
 

@@ -134,3 +134,21 @@
   policy-checked and audited, never via a public URL. Bank account shown masked to staff.
 - `AdminWriteRecorder` → `PanelWriteRecorder`: writes in the partner panel are audited as `partner.created/updated/deleted`
   (security.md: "every admin and partner write"); panel logins as `{panel}.login` / `{panel}.login_failed`.
+
+## 2026-11-01 — Reference data (task 1.8)
+
+- **Renamed to match `data-model.md`:** inherited `visa_categories` (tourist, business…) → **`visa_types`**, and the
+  inherited `visa_types` (e-visa / sticker) → **`visa_formats`**. Legacy `visa_rules` and `applications` columns
+  follow (`visa_type_id` = purpose, `visa_format_id` = format). Products (1.9) use `visa_types`.
+- Countries gain `slug` (URL key, never changed by the seeder once set), `region` (`schengen` | `gcc` | null,
+  `App\Enums\CountryRegion`), `continent`, `seo_title`, `seo_description`.
+- **Data:** `database/data/countries.php`, ISO 3166-1 (249) + Kosovo (XK) with ISO3, continent and demonym.
+  Nationality rows only where the place issues its own passport: 199 (193 UN members + VA, PS, TW, HK, MO, XK).
+  Schengen = 29 states (BG and RO in since 2025; CY and IE out); GCC = 6. Membership lives in `CountryRegion::members()`.
+- **7 visa types:** tourist, medical, business, student, work, transit, family. **2 formats:** e-visa, sticker.
+- `ReferenceDataSeeder` is idempotent and runs on every deploy (`post-deploy.sh`). It refreshes names, codes,
+  regions and flags and adds missing rows, but never touches admin-edited fields (destination/popular/active,
+  description, SEO, order, existing slugs, visa type names). The home country's nationality sorts first.
+- Admin: Countries and Visa types resources (edit only, `catalog.manage`). Reference data stays public to read
+  (`ReferenceDataPolicy`), but the admin screens check `canAccess()`.
+- Not seeded: Bangladesh districts (not in 1.8's scope; needed by courier/drop-off later).
