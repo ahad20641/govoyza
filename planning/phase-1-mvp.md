@@ -11,6 +11,9 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 - [ ] **1.2 Hostinger deploy pipeline (staging first)**
   Follow `deploy/hostinger.md`. GitHub secrets set, `develop` → staging, `main` → production. Cron for `schedule:run`. Health route `/up`.
   Done when: a push to `develop` shows the Laravel welcome page on staging over HTTPS, and `/up` returns 200.
+- [ ] **1.2b Staging password + coming-soon page**
+  HTTP Basic Auth on all of staging except `/up` (hash in staging `.env`, set with `govoyza:staging-password`). Branded static coming-soon page on govoyza.com until production's first deploy; partner./admin. send `noindex`.
+  Done when: staging returns 401 without the password, `/up` stays 200, and govoyza.com shows the coming-soon page.
 - [x] **1.3 Config, domains and base layout**
   `config/govoyza.php` (domains, currencies, company details). `Route::domain()` groups for public / partner / admin. `noindex` header + robots disallow on partner and admin domains. Base Blade layout, Tailwind theme with brand tokens.
   Done when: all three hostnames resolve to the right route group locally and on staging; partner domain sends `X-Robots-Tag: noindex`.
