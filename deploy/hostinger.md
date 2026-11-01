@@ -109,8 +109,16 @@ becomes a symlink to that app's Laravel `public/` folder.
    app's first deploy, or it fails every minute.
 10. **After each app's first deploy:**
     ```bash
-    cd ~/domains/govoyza.com/staging-app && php artisan key:generate --force && php artisan storage:link
+    cd ~/domains/govoyza.com/staging-app && php artisan key:generate --force && php artisan optimize
     ```
+    `post-deploy.sh` creates the `public/storage` link with `ln -s` on every deploy. Hostinger's PHP
+    disables `symlink()`, `proc_open()` and `exec()`, so `artisan storage:link` and Composer scripts
+    don't work there (see `memory/known-issues.md`). Hostinger has no `crontab` command: add step 9's
+    lines through the Hostinger API or hPanel.
+
+> **Production's `public_html` is still Hostinger's placeholder.** Swap it for the `app/public`
+> symlink (step 5, production part) only at production's first deploy. Before then the symlink
+> points at an empty app, and govoyza.com, partner. and admin. would all go down.
     Back up each `APP_KEY` somewhere safe offline. Encrypted passport data is unreadable without it.
 
 ## What each deploy does
