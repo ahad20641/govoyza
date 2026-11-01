@@ -14,7 +14,7 @@ Work top to bottom. Each task: branch → code + Pest tests → Pint → PR → 
 - [x] **1.3 Config, domains and base layout**
   `config/govoyza.php` (domains, currencies, company details). `Route::domain()` groups for public / partner / admin. `noindex` header + robots disallow on partner and admin domains. Base Blade layout, Tailwind theme with brand tokens.
   Done when: all three hostnames resolve to the right route group locally and on staging; partner domain sends `X-Robots-Tag: noindex`.
-- [ ] **1.4 Money value object and currency service**
+- [x] **1.4 Money value object and currency service**
   `Money` (minor units + currency), Eloquent cast, formatting for BDT/USD/EUR. `exchange_rates` table with admin-set rate + buffer %.
   Done when: unit tests cover add/subtract/multiply-by-percent/rounding/conversion.
 

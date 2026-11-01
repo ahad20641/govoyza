@@ -5,45 +5,47 @@
 
 **Last updated:** 2026-11-01
 **Current phase:** Phase 1 — MVP (see `planning/phase-1-mvp.md`)
-**Current task:** 1.4 Money value object and currency service
-**Branch:** `develop`
+**Current task:** 1.5 Auth and roles (1.4 done on `feat/1.4-money-value-object`; 1.2 blocked on owner)
+**Branch:** `feat/1.4-money-value-object` (from `develop`)
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
-- Laravel app with auth, dashboard, admin/security scaffolding, domain-aware routing and base branding
-- Local PHP 8.4 / SQLite setup; migrations pass, 27 Pest tests pass, Pint passes
-- GitHub repo `ahad20641/govoyza` connected; `develop` is the working branch
+- Laravel 13 app: auth, dashboard, admin/security scaffolding, domain-aware routing, base branding
+- Money: `App\Support\Money\Money`, `App\Enums\Currency` (BDT/USD/EUR), `MoneyCast`,
+  `exchange_rates` table + `CurrencyConverter` (buffer %, inverse rate). No admin UI for rates yet (1.6)
+- Local PHP 8.4 / SQLite: 55 tests pass, Pint passes
+- GitHub repo `ahad20641/govoyza`, **now public**. Secret scan of the full history on 2026-11-01 was clean
+- Inherited schema still has `decimal` money columns. See known-issues → Money
 
 ## Environments
 | Env | URL | Branch | Status |
 |---|---|---|---|
-| Local | govoyza.test | any | SQLite configured; migrations and tests pass |
-| Staging | staging.govoyza.com | `develop` | not set up (layout decision pending) |
-| Production | govoyza.com | `main` | domain + SSL live, app not deployed |
+| Local | govoyza.test | any | SQLite; migrations and tests pass |
+| Staging | staging.govoyza.com | `develop` | subdomain exists; app not deployed; web root needs fixing |
+| Production | govoyza.com | `main` | domain + SSL live; app not deployed. Do not deploy yet |
 
-## Waiting on owner
-Task 1.2 (hosting) progress, 2026-11-01. Hostinger account `uXXXXXXX` (shared CloudLinux), govoyza.com already on Hostinger with HTTPS.
-- [x] Subdomains `partner` + `admin` created, root = `domains/govoyza.com/public_html` (same app)
-- [ ] Decide staging layout: subdomain `staging` was created at `public_html/staging`, which clashes with
-      the `public_html → app/public` symlink. Proposal: replace it with a separate website `staging.govoyza.com`
-- [ ] PHP 8.4 + extensions (intl, bcmath, gd/imagick, zip, pdo_mysql, fileinfo, exif) — hPanel only
-- [ ] Enable SSH; add deploy public key (`%USERPROFILE%\.ssh\govoyza_deploy.pub`) in hPanel → SSH Access
-- [ ] MySQL `govoyza_prod` + `govoyza_staging` (hPanel; passwords go only in server `.env`)
-- [ ] Server folders, `public_html` symlink, server `.env` (see `deploy/hostinger.md` step 5)
-- [ ] GitHub secrets still missing: `HOSTINGER_SSH_HOST`, `HOSTINGER_SSH_PORT`, `STAGING_APP_PATH`
-      (set: SSH_KEY, SSH_USER, PROD_APP_PATH, PROD_URL, STAGING_URL)
-- [ ] Production approval gate: repo is private on GitHub Free, so required reviewers are unavailable.
-      `staging` + `production` environments exist without rules. Upgrade to Pro, or rely on PR-to-main as the gate
-- [ ] Cron `schedule:run` per environment, then `key:generate` + `storage:link` after first deploy
+## Waiting on owner — task 1.2 (hosting)
+Owner reports done in hPanel: PHP 8.4 + extensions, SSH enabled, deploy public key added, DBs created.
+- [ ] **SSH host + port**: the last message still had the `HOST_HERE` / `PORT_HERE` placeholders
+- [ ] DBs: the Hostinger API lists 0 databases. Owner to confirm the account and send the full DB/user names (no passwords)
+- [ ] Approve the staging layout: app in `~/domains/govoyza.com/staging-app`, recreate the `staging`
+      subdomain with its root at `staging-app/public` (it's currently `public_html/staging`, inside prod's web root)
+- Done: `partner`/`admin` subdomains (root = `public_html`), `staging` + `production` GitHub environments
+  (production: required reviewer `ahad20641`, `main` only), deploy key `%USERPROFILE%\.ssh\govoyza_deploy`,
+  secrets SSH_KEY, SSH_USER, PROD_APP_PATH, PROD_URL, STAGING_URL
+- Then (Claude): secrets HOST/PORT/STAGING_APP_PATH → fix env names in `deploy/env.production.example`
+  → server folders, symlinks, `.env` (DB_PASSWORD typed by owner) → push `develop` → `key:generate`,
+  `storage:link`, cron → check staging `/up` is 200
 - [ ] Payment gateway sandbox credentials (SSLCommerz, bKash, Nagad, Stripe)
-- [ ] Transactional email provider (SMTP/Postmark/SES) credentials
-- [ ] Phase 0 business items (trade licence, suppliers, top 5 destinations) — see `planning/phase-0-foundations.md`
+- [ ] Transactional email provider credentials
+- [ ] Phase 0 business items. See `planning/phase-0-foundations.md`
 
 ## Open questions
-- Public frontend: Blade + Livewire (default) — confirm no need for Next.js
+- Owner: should the Hostinger username in commit `1559971` (memory file) stay public, or be replaced with `uXXXXXXX`?
+- Public frontend: plain HTML/Blade (per decisions). Confirm there's no need for Livewire or Next.js
 - Default display currency BDT; confirm USD/EUR shown alongside for international buyers
 
 ## Next 3 tasks
-1. 1.4 Money value object and currency service
+1. Merge the 1.4 PR, then finish 1.2 once the owner sends the SSH host/port
 2. 1.5 Auth and roles
-3. 1.6 Admin console (Filament panel on admin domain)
+3. 1.6 Admin console (admin domain; includes the exchange-rate editor)
