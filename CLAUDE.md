@@ -82,6 +82,8 @@ Use `Route::domain()` groups driven by `config('govoyza.domains.*')` so local de
 - Architectural choice not covered here? Add an entry to `memory/decisions.md` before coding.
 - Never push directly to `main`; push to `develop` (auto-deploys to staging) and open a PR to
   `main` (auto-deploys to production). Never run destructive migrations on production.
+- **Merging:** Claude may merge PRs into `develop` once `php artisan test` and CI pass. Claude must
+  **never** merge into `main` or deploy to production without asking the owner first, every time.
 - If something is blocked on the owner (credentials, legal, supplier info), add it to
   `memory/project-state.md` under "Waiting on owner" and move to the next task.
 
