@@ -3,10 +3,10 @@
 > Living snapshot. Claude updates this at the end of every session (`/save-memory`).
 > Keep it under ~60 lines — history goes in `progress-log.md`, not here.
 
-**Last updated:** 2026-11-01
+**Last updated:** 2026-11-02
 **Current phase:** Phase 1 — MVP, built skeleton first (see `planning/phase-1-mvp.md`, "Build order")
-**Current task:** S1 Full skeleton (`feat/skeleton`, includes task 1.10). Next: Area A — Catalogue + Pricing
-**Branch:** `feat/skeleton` → PR to `develop`
+**Current task:** Area A — Catalogue + Pricing. 1.11 is in PR #12; next is 1.12 Pricing engine
+**Branch:** `feat/1.11-requirements-checklist` → PR #12 to `develop`
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
@@ -24,9 +24,11 @@
   `/track`, about/contact/faq/terms/privacy/refund-policy/add-ons/become-an-agent. Customer `/account`, agent `/agent`
 - Schema: every `data-model.md` table exists (money `*_minor` BIGINT). Legacy tables dropped. `app/Domain/*` with READMEs;
   pricing, state machine, routing, ledger, wallet are `NotBuiltYet` stubs
+- Requirements checklist (1.11): Operations manage per-product document items with required/optional state, accepted
+  formats, maximum size and passport-validity rules; live service pages render the customer checklist.
 - `DemoSeeder` (local/staging only, runs each deploy): 5 products, 5 orders, 1 job; demo logins
   `customer@`, `agent@`, `partner@demo.govoyza.test` with random passwords
-- Local PHP 8.4 / SQLite: 157 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
+- Local PHP 8.4 / SQLite: 159 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
 
 ## Environments
 | Env | URL | Branch | Status |
@@ -56,6 +58,6 @@ Server layout matches `deploy/hostinger.md`. Real server details live only in Gi
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. Area A — Catalogue + Pricing: 1.11 requirements, 1.12 pricing engine, 1.13 finder, 1.14 country pages, 1.15 CMS
+1. Area A — Catalogue + Pricing: 1.12 pricing engine, 1.13 finder, 1.14 country pages, 1.15 CMS
 2. Area B — Orders + Documents: 1.16–1.22
 3. Area C — Payments + Ledger: 1.23–1.27
