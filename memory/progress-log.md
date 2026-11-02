@@ -3,6 +3,12 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-01 (task 1.11 requirements checklist)
+- Added an Operations-managed requirements repeater to product forms with document type, required flag, formats, max MB and passport validity months.
+- Public service pages now render the checklist rules; products without a checklist no longer show a coming-soon placeholder.
+- PR #12. Verification: 159 tests / 999 assertions pass; Pint passes.
+- Next: task 1.12 Pricing engine on `feat/catalogue-pricing`.
+
 ## 2026-11-01 (Sprint S1 — full skeleton)
 - Owner changed the approach to skeleton first; logged as a decision, CLAUDE.md gained the code-layout/comment rules,
   phase-1 and roadmap now list S1 then Areas A–D. Committed the planning kit (it had never been committed).

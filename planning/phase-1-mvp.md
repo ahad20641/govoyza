@@ -46,7 +46,7 @@ Each area task still needs its full Pest tests, Pint, a ticked box and `/save-me
 - [x] **1.8 Reference data** — countries (with region, e.g. Schengen), visa types, nationalities. Seeders for all countries + the 7 visa types.
 - [x] **1.9 Products and supplier offers** — see `data-model.md`. Partner creates/edits offers (Draft → Pending review). Edits to a Live offer create a pending revision; live version unchanged until approved.
 - [x] **1.10 Admin review queue** — side-by-side compare with other offers for same country + visa type + nationality. Approve / Request changes (comment) / Reject. On approve: set B2C + B2B markup, public name/description, primary/backup priority, publish product. Cost increases flagged.
-- [ ] **1.11 Requirements checklist** — per-product requirement items (doc type, required, rules: max size, formats, passport validity months).
+- [x] **1.11 Requirements checklist** — per-product requirement items (doc type, required, rules: max size, formats, passport validity months).
 - [ ] **1.12 Pricing engine** — `PriceCalculator` returns breakdown (service price, embassy fee pass-through, VAT, total) per channel/tier/currency. Never typed by hand. Tested with fixtures.
   - [x] Legacy decimal money columns: tables dropped in S1 (`retire_legacy_tables`); `agencies.credit_limit` → `credit_limit_minor`.
 
