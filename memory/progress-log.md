@@ -3,10 +3,16 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-02 (task 1.12 pricing engine)
+- Implemented `PriceCalculator` for B2C/B2B channels, configured tier reductions, VAT, live primary/backup offers, FX conversion and embassy-fee pass-through.
+- Added supplier-safe `PriceBreakdown::toArray()` snapshots and documented configuration defaults. VAT and tier rates remain zero until approved values are supplied.
+- PR #13. Verification: 166 tests / 1,025 assertions pass; Pint passes.
+- Next: task 1.13 Visa finder on `feat/catalogue-pricing`.
+
 ## 2026-11-02 (PR #12 CI correction)
 - Made the requirements JSON assertion order-independent after CI showed SQLite may reorder object keys; values remain asserted individually.
 - Verification: 159 tests / 1001 assertions pass; Pint passes. PHP 8.4 and 8.5 matrix jobs passed on PR #12.
-- Next: task 1.12 Pricing engine after PR #12 checks are green.
+- Next: task 1.12 Pricing engine.
 
 ## 2026-11-01 (task 1.11 requirements checklist)
 - Added an Operations-managed requirements repeater to product forms with document type, required flag, formats, max MB and passport validity months.
