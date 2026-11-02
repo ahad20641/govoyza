@@ -41,6 +41,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Pricing defaults
+    |--------------------------------------------------------------------------
+    |
+    | Zero defaults do not assert a statutory tax rate or negotiated tier rate.
+    | Set approved values before quoting real orders.
+    */
+
+    'pricing' => [
+        'vat_rate' => env('GOVOYZA_VAT_RATE', '0'),
+        'tier_markup_reductions' => [
+            'silver' => env('GOVOYZA_TIER_SILVER_MARKUP_REDUCTION', '0'),
+            'gold' => env('GOVOYZA_TIER_GOLD_MARKUP_REDUCTION', '0'),
+            'platinum' => env('GOVOYZA_TIER_PLATINUM_MARKUP_REDUCTION', '0'),
+        ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Admin console
     |--------------------------------------------------------------------------
     |
