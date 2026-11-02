@@ -3,7 +3,7 @@
 > Living snapshot. Claude updates this at the end of every session (`/save-memory`).
 > Keep it under ~60 lines — history goes in `progress-log.md`, not here.
 
-**Last updated:** 2026-11-01
+**Last updated:** 2026-11-02
 **Current phase:** Phase 1 — MVP, built skeleton first (see `planning/phase-1-mvp.md`, "Build order")
 **Current task:** Area A — Catalogue + Pricing. 1.11 is in PR #12; next is 1.12 Pricing engine
 **Branch:** `feat/1.11-requirements-checklist` → PR #12 to `develop`

@@ -51,6 +51,7 @@
   new code). Harmless: `down` is `|| true`, so that one deploy just runs without maintenance mode.
 
 ## Tests
+- JSON column key order is not stable across database drivers; assert individual keys/values or canonicalize instead of comparing the whole array with `assertSame`.
 - `db:seed` (and `$this->seed()`) asks for confirmation when `APP_ENV=production`, which throws in tests. Call
   `app(SomeSeeder::class)->run()` directly to test a seeder's production guard.
 - `actingAs()` sticks for the rest of the test, so "guest gets redirected" checks must run before any `actingAs()`.

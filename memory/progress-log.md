@@ -3,10 +3,15 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-02 (PR #12 CI correction)
+- Made the requirements JSON assertion order-independent after CI showed SQLite may reorder object keys; values remain asserted individually.
+- Verification: 159 tests / 1001 assertions pass; Pint passes. PHP 8.4 and 8.5 matrix jobs passed on PR #12.
+- Next: task 1.12 Pricing engine after PR #12 checks are green.
+
 ## 2026-11-01 (task 1.11 requirements checklist)
 - Added an Operations-managed requirements repeater to product forms with document type, required flag, formats, max MB and passport validity months.
 - Public service pages now render the checklist rules; products without a checklist no longer show a coming-soon placeholder.
-- PR #12. Verification: 159 tests / 999 assertions pass; Pint passes.
+- PR #12. Initial verification: 159 tests / 999 assertions pass; Pint passes.
 - Next: task 1.12 Pricing engine on `feat/catalogue-pricing`.
 
 ## 2026-11-01 (Sprint S1 — full skeleton)

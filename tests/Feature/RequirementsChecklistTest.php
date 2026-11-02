@@ -47,7 +47,10 @@ class RequirementsChecklistTest extends TestCase
         $this->assertSame('Passport bio page', $requirement->label);
         $this->assertSame('passport', $requirement->doc_type);
         $this->assertTrue($requirement->is_required);
-        $this->assertSame(['formats' => ['pdf', 'jpg'], 'max_mb' => 5, 'passport_valid_months' => 6], $requirement->rules);
+        // JSON object keys may be reordered by the database driver.
+        $this->assertSame(['pdf', 'jpg'], $requirement->rules['formats']);
+        $this->assertSame(5, $requirement->rules['max_mb']);
+        $this->assertSame(6, $requirement->rules['passport_valid_months']);
         $this->assertSame(Product::sole()->id, $requirement->product_id);
     }
 
