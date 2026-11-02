@@ -23,7 +23,20 @@ final readonly class PriceBreakdown
     /** @return array<string, array{minor: int, currency: string}> */
     public function toArray(): array
     {
-        // TODO(1.12): settle the snapshot format with the order placement task (1.17).
-        return [];
+        return [
+            'service_price' => $this->line($this->servicePrice),
+            'embassy_fee' => $this->line($this->embassyFee),
+            'vat' => $this->line($this->vat),
+            'total' => $this->line($this->total),
+        ];
+    }
+
+    /** @return array{minor: int, currency: string} */
+    private function line(Money $money): array
+    {
+        return [
+            'minor' => $money->minor,
+            'currency' => $money->currency->value,
+        ];
     }
 }

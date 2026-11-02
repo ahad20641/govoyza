@@ -19,6 +19,12 @@
 - CI and production continue to use MySQL; `.env.example` and the CI MySQL service remain unchanged.
 - Node.js 26 is the selected local and CI major version; Composer is 2.11.
 
+## 2026-11-02 — Pricing defaults (task 1.12)
+
+- VAT and agency-tier markup reductions are configurable exact decimal strings in `config/govoyza.php` and default to zero until the owner supplies approved rates; no statutory or negotiated percentages are assumed.
+- Percent markup applies to the converted supplier cost. Fixed markup is stored in minor units in the product currency. B2B tier reductions apply to markup only.
+- VAT applies to the service price; the embassy fee remains a separate pass-through line converted without the FX buffer. Supplier cost and partner identity never enter the customer-facing price snapshot.
+
 ## 2026-11-01 — Money value object and currency conversion (task 1.4)
 
 - Own `App\Support\Money\Money` (int minor units + `App\Enums\Currency`) built on `brick/math`,
