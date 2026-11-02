@@ -1,4 +1,4 @@
-{{-- Home page with the visa finder. Public site. Task 1.13 — Home + visa finder (S1: form UI only). --}}
+{{-- Home page with the visa finder. Public site. Task 1.13 — Home + visa finder. --}}
 <x-layouts.public title="Your visa journey, simplified" description="Apply for visas online: check requirements, upload documents, pay securely and track your application.">
 
     {{-- ===== Hero + visa finder ===== --}}
@@ -13,7 +13,7 @@
                     <label for="nationality">I am a citizen of</label>
                     <select id="nationality" name="nationality" class="input">
                         @foreach ($nationalities as $nationality)
-                            <option value="{{ $nationality->country?->iso2 }}">{{ $nationality->demonym }}</option>
+                            <option value="{{ $nationality->country?->iso2 }}" @selected($nationality->country?->iso2 === $defaultNationality)>{{ $nationality->demonym }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -37,7 +37,6 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Find my visa</button>
             </form>
-            <x-coming-soon task="1.13">Results matched to your nationality, with price, processing time and requirements.</x-coming-soon>
         </div>
     </section>
 

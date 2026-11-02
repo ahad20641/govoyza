@@ -5,6 +5,7 @@ namespace App\Domain\Pricing;
 use App\Enums\AgencyTier;
 use App\Enums\Currency;
 use App\Enums\MarkupType;
+use App\Enums\OfferPriority;
 use App\Enums\OrderChannel;
 use App\Enums\ProductStatus;
 use App\Enums\SupplierOfferStatus;
@@ -59,6 +60,21 @@ class PriceCalculator
 
     private function liveOffer(Product $product): SupplierOffer
     {
+        if ($product->relationLoaded('supplierOffers')) {
+            $offer = $product->supplierOffers
+                ->where('status', SupplierOfferStatus::Live)
+                ->sortBy(fn (SupplierOffer $candidate) => match ($candidate->priority) {
+                    OfferPriority::Primary => 0,
+                    OfferPriority::Backup => 1,
+                    default => 2,
+                })
+                ->first();
+
+            if ($offer) {
+                return $offer;
+            }
+        }
+
         $offer = $product->supplierOffers()
             ->where('status', SupplierOfferStatus::Live)
             ->orderByRaw("CASE priority WHEN 'primary' THEN 0 WHEN 'backup' THEN 1 ELSE 2 END")

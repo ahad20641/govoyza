@@ -3,11 +3,17 @@
 > Newest first. One short entry per working session: date, what was done, what's next.
 > Claude appends here during `/save-memory`.
 
+## 2026-11-02 (task 1.13 visa finder)
+- Completed home finder and result search by nationality, destination and visa purpose; results show B2C pricing, processing times and requirement summaries.
+- Only live products with live offers are listed. Supplier identity/cost stay hidden; the configured currency and `PriceCalculator` power displayed totals.
+- PR #14. Verification: 169 tests / 1,046 assertions pass; Pint passes.
+- Next: task 1.14 Country and visa-type pages on Area A.
+
 ## 2026-11-02 (task 1.12 pricing engine)
 - Implemented `PriceCalculator` for B2C/B2B channels, configured tier reductions, VAT, live primary/backup offers, FX conversion and embassy-fee pass-through.
 - Added supplier-safe `PriceBreakdown::toArray()` snapshots and documented configuration defaults. VAT and tier rates remain zero until approved values are supplied.
 - PR #13. Verification: 166 tests / 1,025 assertions pass; Pint passes.
-- Next: task 1.13 Visa finder on `feat/catalogue-pricing`.
+- Next: task 1.13 Visa finder.
 
 ## 2026-11-02 (PR #12 CI correction)
 - Made the requirements JSON assertion order-independent after CI showed SQLite may reorder object keys; values remain asserted individually.
