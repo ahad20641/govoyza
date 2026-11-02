@@ -33,10 +33,26 @@
                     <h2>Documents you'll need</h2>
                     @forelse ($product->requirements as $requirement)
                         @if ($loop->first)<ul>@endif
-                        <li>{{ $requirement->label }} @unless ($requirement->is_required)<span class="muted">(optional)</span>@endunless</li>
+                        <li>
+                            <strong>{{ $requirement->label }}</strong>
+                            @unless ($requirement->is_required)<span class="muted">(optional)</span>@endunless
+                            @if ($requirement->rules)
+                                <span class="muted small">
+                                    @if (! empty($requirement->rules['formats']))
+                                        Formats: {{ implode(', ', array_map('strtoupper', $requirement->rules['formats'])) }}.
+                                    @endif
+                                    @if (! empty($requirement->rules['max_mb']))
+                                        Maximum size: {{ $requirement->rules['max_mb'] }} MB.
+                                    @endif
+                                    @if (! empty($requirement->rules['passport_valid_months']))
+                                        Passport validity: at least {{ $requirement->rules['passport_valid_months'] }} months.
+                                    @endif
+                                </span>
+                            @endif
+                        </li>
                         @if ($loop->last)</ul>@endif
                     @empty
-                        <x-coming-soon task="1.11">The document checklist for this visa.</x-coming-soon>
+                        <p class="muted">No document requirements have been published for this visa yet.</p>
                     @endforelse
                 </div>
 
