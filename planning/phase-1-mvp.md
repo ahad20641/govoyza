@@ -51,7 +51,7 @@ Each area task still needs its full Pest tests, Pint, a ticked box and `/save-me
   - [x] Legacy decimal money columns: tables dropped in S1 (`retire_legacy_tables`); `agencies.credit_limit` → `credit_limit_minor`.
 
 ## 1D · Public site
-- [ ] **1.13 Home + visa finder** — nationality / destination / purpose search → matching products with price, processing time, requirements.
+- [x] **1.13 Home + visa finder** — nationality / destination / purpose search → matching products with price, processing time, requirements.
 - [ ] **1.14 Country pages, visa-type pages, service detail** — `/visa/{country}`, `/visa/{country}/{type}`; auto-generated from catalogue; SEO meta, JSON-LD, sitemap.xml (public domain only).
 - [ ] **1.15 Static/CMS pages** — About, Contact, FAQ, Terms, Privacy, Refund, Become an agent (simple CMS in admin).
 - [ ] **1.16 Track application** — order number + email, no login, rate-limited.

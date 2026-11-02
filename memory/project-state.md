@@ -5,8 +5,8 @@
 
 **Last updated:** 2026-11-02
 **Current phase:** Phase 1 — MVP, built skeleton first (see `planning/phase-1-mvp.md`, "Build order")
-**Current task:** Area A — Catalogue + Pricing. 1.11 merged in PR #12; 1.12 is in PR #13. Next: 1.13 Visa finder
-**Branch:** `feat/catalogue-pricing` → PR #13 to `develop`
+**Current task:** Area A — Catalogue + Pricing. 1.13 is in PR #14; next is 1.14 Country and visa-type pages
+**Branch:** `feat/1.13-visa-finder` → PR #14 to `develop`
 **Project root:** `D:\AI Workflow For GoVoyza\Claude Code Workbase` (Windows)
 
 ## What exists
@@ -20,17 +20,17 @@
   S1 shells: Today board, supplier offers, orders, customers, agencies, staff, ledger, payouts, P&L, payables, CMS, coupons, settings
 - Partner portal (Filament, 2FA, invite-only): KYC, bank details, agreement, my services (real); assigned jobs + job
   detail, earnings, performance (S1 shells, scoped to the partner)
-- Public site (S1 shells): home + finder form, `/visa`, `/visa/{country}`, `/visa/{country}/{type}`, `/services/{product}`,
-  `/track`, about/contact/faq/terms/privacy/refund-policy/add-ons/become-an-agent. Customer `/account`, agent `/agent`
+- Public site: home visa finder and `/visa` results search nationality/destination/purpose with B2C prices, processing
+  times and requirements. Country/type/service pages, `/track`, static pages and customer `/account`/agent `/agent` remain in their task shells.
 - Schema: every `data-model.md` table exists (money `*_minor` BIGINT). Legacy tables dropped. `app/Domain/*` with READMEs;
-  pricing, state machine, routing, ledger, wallet are `NotBuiltYet` stubs
+  state machine, routing, ledger and wallet are `NotBuiltYet` stubs
 - Requirements checklist (1.11): Operations manage per-product document items with required/optional state, accepted
   formats, maximum size and passport-validity rules; live service pages render the customer checklist.
 - Pricing engine (1.12): channel/tier quotes use the best available live offer, configured markups, VAT, embassy-fee
   pass-through and buffered currency conversion. Breakdown snapshots contain no supplier identity or cost.
 - `DemoSeeder` (local/staging only, runs each deploy): 5 products, 5 orders, 1 job; demo logins
   `customer@`, `agent@`, `partner@demo.govoyza.test` with random passwords
-- Local PHP 8.4 / SQLite: 166 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
+- Local PHP 8.4 / SQLite: 169 tests pass, Pint passes. GitHub repo `ahad20641/govoyza` is **public**
 
 ## Environments
 | Env | URL | Branch | Status |
@@ -60,6 +60,6 @@ Server layout matches `deploy/hostinger.md`. Real server details live only in Gi
 - Off-server DB backups (1.31): Hostinger disables `exec`/`proc_open`, so `mysqldump` via laravel-backup won't run
 
 ## Next 3 tasks
-1. Area A — Catalogue + Pricing: 1.13 finder, 1.14 country pages, 1.15 CMS
+1. Area A — Catalogue + Pricing: 1.14 country pages, 1.15 CMS
 2. Area B — Orders + Documents: 1.16–1.22
 3. Area C — Payments + Ledger: 1.23–1.27
