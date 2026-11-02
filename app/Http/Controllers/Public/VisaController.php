@@ -2,12 +2,18 @@
 
 namespace App\Http\Controllers\Public;
 
+use App\Domain\Pricing\PriceCalculator;
+use App\Enums\Currency;
+use App\Enums\OrderChannel;
 use App\Enums\ProductStatus;
+use App\Enums\SupplierOfferStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Country;
+use App\Models\Nationality;
 use App\Models\Product;
 use App\Models\VisaType;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 /**
@@ -20,22 +26,54 @@ use Illuminate\View\View;
 class VisaController extends Controller
 {
     /** Finder results, or every destination when no search was made. */
-    public function index(Request $request): View
+    public function index(Request $request, PriceCalculator $prices): View
     {
-        $destination = $request->filled('destination')
-            ? Country::query()->active()->where('slug', $request->string('destination'))->first()
+        $nationalities = Nationality::query()->active()->with('country:id,iso2')->get();
+        $nationalityCodes = $nationalities->pluck('country.iso2')->filter()->values()->all();
+        $filters = $request->validate([
+            'nationality' => ['nullable', 'string', 'size:2', Rule::in($nationalityCodes)],
+            'destination' => ['nullable', 'string', Rule::exists('countries', 'slug')->where('is_active', true)],
+            'purpose' => ['nullable', 'string', Rule::exists('visa_types', 'slug')->where('is_active', true)],
+        ]);
+
+        $nationality = isset($filters['nationality']) ? strtoupper($filters['nationality']) : null;
+        $nationalityLabel = $nationalities->first(fn (Nationality $item) => $item->country?->iso2 === $nationality)?->demonym;
+        $destination = isset($filters['destination'])
+            ? Country::query()->active()->where('slug', $filters['destination'])->firstOrFail()
             : null;
+        $purpose = $filters['purpose'] ?? null;
 
         $products = Product::query()->live()
-            ->with(['country', 'visaType'])
+            ->whereHas('supplierOffers', fn ($query) => $query->where('status', SupplierOfferStatus::Live))
+            ->with([
+                'country',
+                'visaType',
+                'requirements',
+                'supplierOffers' => fn ($query) => $query->where('status', SupplierOfferStatus::Live)
+                    ->orderByRaw("CASE priority WHEN 'primary' THEN 0 WHEN 'backup' THEN 1 ELSE 2 END")
+                    ->orderBy('id'),
+            ])
             ->when($destination, fn ($q) => $q->where('country_id', $destination->id))
-            ->when($request->filled('purpose'), fn ($q) => $q->whereHas('visaType', fn ($t) => $t->where('slug', $request->string('purpose'))))
+            ->when($purpose, fn ($q) => $q->whereHas('visaType', fn ($t) => $t->where('slug', $purpose)))
+            ->when($nationality, fn ($q) => $q->where(fn ($matches) => $matches
+                ->whereNull('nationality_iso2')->orWhere('nationality_iso2', $nationality)))
             ->orderBy('public_name')
             ->limit(50)
             ->get();
-        // TODO(1.13): filter by applicant nationality (products.nationality_iso2 null = any) and show prices.
 
-        return view('public.visa.index', ['products' => $products, 'destination' => $destination]);
+        $currency = Currency::from(config('govoyza.currency'));
+        $productPrices = $products->mapWithKeys(fn (Product $product) => [
+            $product->id => $prices->quote($product, OrderChannel::B2c, 'retail', $currency),
+        ]);
+
+        return view('public.visa.index', [
+            'products' => $products,
+            'productPrices' => $productPrices,
+            'destination' => $destination,
+            'nationality' => $nationality,
+            'nationalityLabel' => $nationalityLabel,
+            'purpose' => $purpose,
+        ]);
     }
 
     public function country(Country $country): View
